@@ -1,3 +1,23 @@
-Elia & Jessica's Login Project
-========
-Before this folder was made in submissions we were using <a href = "https://github.com/artofelia/UserProj">this</a> repository so please check that if you want to see more of our push history. 
+# pathfinder
+Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
+----
+<project link>
+<project video???>
+
+Lawrence - Server + stuff
+
+Jessica - (CSS? + )stuff
+
+Vanessa - stuff
+
+Corrin - stuff
+
+------
+Elements:
+* storing info (login, data, etc)
+ * auto save?
+* auto fill/calculate views
+* random dice generator
+ 
+-----
+Timeline
