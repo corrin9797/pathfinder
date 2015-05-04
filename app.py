@@ -1,8 +1,16 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, jsonify, json
 from functools import wraps
+from pymongo import MongoClient
+import bson.json_util
 import base
 
+
 app = Flask(__name__)
+
+client = MongoClient()
+db = client['pathfinder']
+chatdb = db['chat']
+moddb = db['module']
 
 def validate(func):
     @wraps(func)
@@ -123,6 +131,56 @@ def illegal():
 def reset():
     base.restart()
     return redirect(url_for('index'))
+
+@app.route('/on_test')
+def on_test():
+    return render_template("test/on_test.html")
+
+@app.route("/ajax/module/<name>",methods=['GET','POST'])
+def ajax_module(name):
+    mod = moddb.find_one({"title":name.replace("%20"," ")})
+    if request.method == "POST":
+        pass #uh
+    return bson.json_util.dumps(mod)
+    
+
+@app.route("/ajax/chat/<channel>",methods=['GET','POST'])
+def ajax_chat(channel):
+    curChan = chatdb.find_one({"title":channel.replace("%20"," ")})
+    if request.method == "POST":
+        pdat = json.loads(request.data)
+        newChat = {"author":pdat["author"],
+                   "content":pdat["content"]}
+        curChan["chat"].append(newChat)
+        if len(curChan["chat"]) > 200:
+            curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]
+        chatdb.save(curChan)
+    r = ""
+    for msg in curChan["chat"]:
+
+        r+="&lt;%s&gt; %s<br>\n" % (msg["author"],msg["content"])
+    return jsonify(content=r)
+
+def initchatdb():
+    testChan = chatdb.find_one({"title":"test"})
+    if not testChan:
+        testChan = {"title":"test",
+                    "chat":[]}
+        chatdb.insert(testChan)
+
+#DEFINITELY NOT PRODUCTION CODE :^(
+def initmoddb():
+    pmod = moddb.find_one({"title":"Pathfinder Test"})
+    #if not pmod:
+    if True: #testy
+        moddb.remove({}) #blood for the blood god
+        pjsonf = open("static/test/pathfinder.json")
+        pjson = json.load(pjsonf)
+        pjsonf.close()
+        moddb.insert(pjson)
+
+initchatdb()
+initmoddb()
 
 # set the secret key.  keep this really secret:
 #this is fake very fake oooh
