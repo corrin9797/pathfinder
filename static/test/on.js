@@ -35,6 +35,7 @@ App.NameView = Marionette.ItemView.extend({
 		"click #namesetbutton": function(){
             var newname = $("#nametext").val();
             if (newname != "") {
+		
                 this.model.set({name:newname});
             }
         },
@@ -112,7 +113,7 @@ App.CharsheetView = Marionette.ItemView.extend({
 	},
 	modelEvents: {
 		"change":function(){
-			this.render();  
+			this.render();
 		}
     }
 });

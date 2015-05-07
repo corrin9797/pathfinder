@@ -132,6 +132,20 @@ def reset():
     base.restart()
     return redirect(url_for('index'))
 
+################################################################
+@app.route("/test")
+def test():
+     ###
+    cres = chatdb.usertable.find()
+    #{}, {'_id':False})
+    #print cres
+    #res = [r
+    for l in cres:
+        print l
+    print "yolo"
+    print chatdb.find_one({"title":"test".replace("%20"," ")})
+    return "hi"
+
 @app.route('/on_test')
 def on_test():
     return render_template("test/on_test.html")
@@ -150,7 +164,7 @@ def ajax_chat(channel):
     if request.method == "POST":
         pdat = json.loads(request.data)
         newChat = {"author":pdat["author"],
-                   "content":pdat["content"]}
+                    "content":pdat["content"]}
         curChan["chat"].append(newChat)
         if len(curChan["chat"]) > 200:
             curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]
