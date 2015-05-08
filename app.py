@@ -1,6 +1,6 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, jsonify, json
 from functools import wraps
-from pymongo import MongoClient
+from pymongo import MongoClient, Connection
 import bson.json_util
 import base
 
@@ -12,7 +12,8 @@ db = client['pathfinder']
 chatdb = db['chat']
 moddb = db['module']
 
-stat = db['stat']
+conn = Connection()
+stat = conn['stat']
 
 def validate(func):
     @wraps(func)
@@ -53,12 +54,19 @@ def login():
     #else:
     return render_template ("login.html")
 
+@app.route ("/input_reset")
+def input_reset():
+    stat.stattable.drop()
+    i = {"user":"hello", "stats":[1,2,3,4]}
+    stat.stattable.insert(i)
+    return redirect (url_for ("input"))
+
 @app.route("/input", methods=['GET', 'POST'])
 def input():
-    
-    if request.method == 'POST':
-        
-    return render_template("input.html")
+    #if request.method == 'POST':
+    #return get value in stattable
+    return "hi"
+    #return render_template("input.html")
 
 @app.route('/logout')
 def logout():
@@ -143,6 +151,7 @@ def reset():
     return redirect(url_for('index'))
 
 ################################################################
+#mongoclient
 @app.route("/test")
 def test():
      ###
