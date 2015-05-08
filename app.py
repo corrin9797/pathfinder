@@ -12,6 +12,8 @@ db = client['pathfinder']
 chatdb = db['chat']
 moddb = db['module']
 
+stat = db['stat']
+
 def validate(func):
     @wraps(func)
     def inner (*args, **kwargs):
@@ -29,6 +31,7 @@ def validate(func):
 
 @app.route('/')
 def index():
+    base.printData()
     if 'username' in session:
         return render_template ("index.html", 
                                 corner = escape(session['username']))
@@ -49,6 +52,13 @@ def index():
 def login():
     #else:
     return render_template ("login.html")
+
+@app.route("/input", methods=['GET', 'POST'])
+def input():
+    
+    if request.method == 'POST':
+        
+    return render_template("input.html")
 
 @app.route('/logout')
 def logout():
