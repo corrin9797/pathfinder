@@ -63,10 +63,14 @@ def input_reset():
 
 @app.route("/input", methods=['GET', 'POST'])
 def input():
-    #if request.method == 'POST':
-    #return get value in stattable
-    return "hi"
-    #return render_template("input.html")
+    if request.method == 'POST':
+        i = {"user": request.form ["name"], "stats":request.form [
+        "stat"]}
+        stat.stattable.insert(i)
+    cres = stat.stattable.find()
+    for r in cres:
+        print r
+    return """<form method = "POST"><input type = "text" name = name id="input"></input><input type = "text" name = stat id="input"></input><input type = "submit"></input></form>"""
 
 @app.route('/logout')
 def logout():
