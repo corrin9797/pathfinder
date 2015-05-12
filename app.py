@@ -1,6 +1,6 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, jsonify, json
 from functools import wraps
-from pymongo import MongoClient
+from pymongo import MongoClient, Connection
 import bson.json_util
 import base
 
@@ -12,6 +12,9 @@ db = client['pathfinder']
 chatdb = db['chat']
 moddb = db['module']
 sheetdb = db['charsheet']
+
+conn = Connection()
+stat = conn['stat']
 
 def validate(func):
     @wraps(func)
@@ -30,6 +33,7 @@ def validate(func):
 
 @app.route('/')
 def index():
+    base.printData()
     if 'username' in session:
         return render_template ("index.html", 
                                 corner = escape(session['username']))
@@ -50,6 +54,24 @@ def index():
 def login():
     #else:
     return render_template ("login.html")
+
+@app.route ("/input_reset")
+def input_reset():
+    stat.stattable.drop()
+    i = {"user":"hello", "stats":[1,2,3,4]}
+    stat.stattable.insert(i)
+    return redirect (url_for ("input"))
+
+@app.route("/input", methods=['GET', 'POST'])
+def input():
+    if request.method == 'POST':
+        i = {"user": request.form ["name"], "stats":request.form [
+        "stat"]}
+        stat.stattable.insert(i)
+    cres = stat.stattable.find()
+    for r in cres:
+        print r
+    return """<form method = "POST"><input type = "text" name = name id="input"></input><input type = "text" name = stat id="input"></input><input type = "submit"></input></form>"""
 
 @app.route('/logout')
 def logout():
@@ -133,6 +155,21 @@ def reset():
     base.restart()
     return redirect(url_for('index'))
 
+################################################################
+#mongoclient
+@app.route("/test")
+def test():
+     ###
+    cres = chatdb.usertable.find()
+    #{}, {'_id':False})
+    #print cres
+    #res = [r
+    for l in cres:
+        print l
+    print "yolo"
+    print chatdb.find_one({"title":"test".replace("%20"," ")})
+    return "hi"
+
 @app.route('/on_test')
 def on_test():
     return render_template("test/on_test.html")
@@ -143,7 +180,7 @@ def ajax_chat(channel):
     if request.method == "POST":
         pdat = json.loads(request.data)
         newChat = {"author":pdat["author"],
-                   "content":pdat["content"]}
+                    "content":pdat["content"]}
         curChan["chat"].append(newChat)
         if len(curChan["chat"]) > 200:
             curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]

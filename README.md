@@ -30,4 +30,19 @@ Timeline
   *	Views that are tied to the existence of other views (1 week)
 * Random dice generator (1 day)
 
+5/12/15 - elements: login present. using chat as basis for storage. working on adapting it to database structure required for project. working on js meant to show on the page itself.
 
+Database Structures
+
+Database: User Info
+{user: username,
+pass: password}
+
+Database: Modules
+{type: pathfinder,
+<stuff specific to pathfinder>}
+
+Database: Character_Sheets
+{user: name,
+type: pathfinder,
+<stuff specific to type of game>}
