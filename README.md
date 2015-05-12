@@ -40,9 +40,9 @@ pass: password}
 
 Database: Modules
 {type: pathfinder,
-<stuff specific to pathfinder>}
+[stuff specific to pathfinder]}
 
 Database: Character_Sheets
 {user: name,
 type: pathfinder,
-<stuff specific to type of game>}
+[stuff specific to type of game]}
