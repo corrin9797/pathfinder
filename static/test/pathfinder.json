@@ -1,7 +1,11 @@
 {
-    "title":"Pathfinder Test",
+    "title":"Pathfinder",
     "author":"yourmom",
     "basestats": [
+        {"name":"Name", "type":"str", "locked":false},
+        
+        {"name":"Player", "type":"str", "locked":false},
+        
         {"name":"STR", "type":"int", "locked":false},
         {"name":"DEX", "type":"int", "locked":false},
         {"name":"CON", "type":"int", "locked":false},

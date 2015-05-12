@@ -91,6 +91,13 @@ App.ChatView = Marionette.CompositeView.extend({
 App.CharsheetView = Marionette.ItemView.extend({
 	template: "#charsheet-template",
 	tagName: "div",
+    templateHelpers: function() {
+        return {
+            showStats: function() {
+                return "penis";
+            }
+        };
+    },
 	events: {
         /*
 		"click #namesetbutton": function(){
@@ -129,12 +136,16 @@ var chats = new Chats();
 var charsheet = new Charsheet();
 
 var module = {};
+var sheet = {};
 
-console.log("ayy");
-$.getJSON("/static/test/pathfinder.json",function(json){
-    module = json;
-    console.log(json);
+$.getJSON("/ajax/module/Pathfinder",function(modjson){
+    module = modjson;
+    $.getJSON("/ajax/charsheet/Jamal/Bob",function(sheetjson){
+        charsheet.attributes = sheetjson;
+    })
 })
-console.log("ayy");
+
+
+
 
 App.start();

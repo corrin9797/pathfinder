@@ -11,6 +11,7 @@ client = MongoClient()
 db = client['pathfinder']
 chatdb = db['chat']
 moddb = db['module']
+sheetdb = db['charsheet']
 
 def validate(func):
     @wraps(func)
@@ -136,14 +137,6 @@ def reset():
 def on_test():
     return render_template("test/on_test.html")
 
-@app.route("/ajax/module/<name>",methods=['GET','POST'])
-def ajax_module(name):
-    mod = moddb.find_one({"title":name.replace("%20"," ")})
-    if request.method == "POST":
-        pass #uh
-    return bson.json_util.dumps(mod)
-    
-
 @app.route("/ajax/chat/<channel>",methods=['GET','POST'])
 def ajax_chat(channel):
     curChan = chatdb.find_one({"title":channel.replace("%20"," ")})
@@ -161,6 +154,22 @@ def ajax_chat(channel):
         r+="&lt;%s&gt; %s<br>\n" % (msg["author"],msg["content"])
     return jsonify(content=r)
 
+@app.route("/ajax/module/<name>",methods=['GET','POST'])
+def ajax_module(name):
+    mod = moddb.find_one({"title":name.replace("%20"," ")})
+    if request.method == "POST":
+        pass #uh
+    return bson.json_util.dumps(mod)
+
+@app.route("/ajax/charsheet/<username>/<charname>",
+           methods=['GET','POST'])
+def ajax_charsheet(username,charname):
+    sheet = sheetdb.find_one({"User":username.replace("%20"," "),
+                              "Name":charname.replace("%20"," ")})
+    if request.method == "POST":
+        pass #uh
+    return bson.json_util.dumps(sheet)
+
 def initchatdb():
     testChan = chatdb.find_one({"title":"test"})
     if not testChan:
@@ -170,7 +179,8 @@ def initchatdb():
 
 #DEFINITELY NOT PRODUCTION CODE :^(
 def initmoddb():
-    pmod = moddb.find_one({"title":"Pathfinder Test"})
+    pmod = moddb.find_one({"title":"Pathfinder"})
+    print moddb.find_one({})
     #if not pmod:
     if True: #testy
         moddb.remove({}) #blood for the blood god
@@ -179,8 +189,20 @@ def initmoddb():
         pjsonf.close()
         moddb.insert(pjson)
 
+#ALSO DEFINITELY NOT PRODUCTION CODE :^((((
+def initsheetdb():
+    #bob = sheetdb.find_one({"Name":"Bob","User":"Jamal"})
+    #if not bob:
+    if True: #testy
+        sheetdb.remove({}) #blood for the blood god
+        bobjsonf = open("static/test/bob.json")
+        bobjson = json.load(bobjsonf)
+        bobjsonf.close()
+        sheetdb.insert(bobjson)
+
 initchatdb()
 initmoddb()
+initsheetdb()
 
 # set the secret key.  keep this really secret:
 #this is fake very fake oooh
