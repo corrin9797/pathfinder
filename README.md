@@ -13,16 +13,16 @@ Vanessa - js/html
 Corrin - js/html
 
 idek????
-------
+
 Elements:
+------
 * storing info (login, data, etc)
  * auto save?
 * auto fill/calculate views
 * random dice generator
- 
------
-Timeline
 
+Timeline
+-----
 * Storing information
   *	Login (2 days)
   *	Tying login to information (3 days)
