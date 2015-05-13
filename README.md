@@ -1,17 +1,18 @@
 # pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
-<project link>
-<project video???>
+[project link]
+[project video???]
 
-Lawrence - Server + stuff
+Lawrence - Server + mongo/json/sorta js
 
-Jessica - (CSS? + )stuff
+Jessica - (CSS? + )mongo
 
-Vanessa - stuff
+Vanessa - js/html
 
-Corrin - stuff
+Corrin - js/html
 
+idek????
 ------
 Elements:
 * storing info (login, data, etc)
