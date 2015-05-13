@@ -2,6 +2,7 @@
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
 [project link]
+
 [project video???]
 
 Lawrence - Server + mongo/json/sorta js
@@ -35,15 +36,25 @@ Timeline
 
 Database Structures
 
+<p>
 Database: User Info
+
 {user: username,
+
 pass: password}
 
+<p>
 Database: Modules
+
 {type: pathfinder,
+
 [stuff specific to pathfinder]}
 
+<p>
 Database: Character_Sheets
+
 {user: name,
+
 type: pathfinder,
+
 [stuff specific to type of game]}
