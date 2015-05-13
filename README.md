@@ -6,7 +6,7 @@ Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 
 Lawrence - Server + mongo/json/sorta js
 
-Jessica - (CSS? + )mongo
+Jessica - (CSS? + )mongo + flask
 
 Vanessa - js/html
 
