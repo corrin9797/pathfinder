@@ -10,6 +10,10 @@ app = Flask(__name__)
 conn = Connection()
 stat = conn['stat']
 
+@app.route ("/")
+def index():
+    return "yolo"
+
 @app.route ("/input_reset")
 def input_reset():
     stat.stattable.drop()
