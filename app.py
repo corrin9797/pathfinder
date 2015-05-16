@@ -56,6 +56,7 @@ def test():
 
 @app.route('/on_test')
 def on_test():
+    initeverything() #sweet jesus why
     return render_template("test/on_test.html")
 
 @app.route("/ajax/chat/<channel>",methods=['GET','POST'])
@@ -91,6 +92,7 @@ def ajax_charsheet(username,charname):
         pass #uh
     return bson.json_util.dumps(sheet)
 
+#JESUS
 def initchatdb():
     testChan = chatdb.find_one({"title":"test"})
     if not testChan:
@@ -121,9 +123,12 @@ def initsheetdb():
         bobjsonf.close()
         sheetdb.insert(bobjson)
 
-initchatdb()
-initmoddb()
-initsheetdb()
+def initeverything():
+    initchatdb()
+    initmoddb()
+    initsheetdb()
+
+initeverything()
 
 # set the secret key.  keep this really secret:
 #this is fake very fake oooh

@@ -92,10 +92,28 @@ App.ChatView = Marionette.CompositeView.extend({
 App.CharsheetView = Marionette.ItemView.extend({
 	template: "#charsheet-template",
 	tagName: "div",
+    serializeData: function() {
+        var data = Backbone.Marionette.ItemView.prototype.serializeData.apply(this,arguments);
+        data.attributes = this.model.attributes
+        return data;
+    },
     templateHelpers: function() {
         return {
             showStats: function() {
-                return "penis";
+                sheet = this.attributes.sheet;
+                module = this.attributes.module;
+                
+                charstats = {}
+                for (stat in sheet) {
+                    charstats[stat] = sheet[stat];
+                }
+
+                for (stat in module.derivedstats) {
+                    //charstats[stat] = formulathingy(module.derivedStats[stat].formula,charstats);
+                    charstats[stat] = module.derivedstats[stat].formula;
+                }
+
+                return strformat(module.layout, charstats);
             }
         };
     },
@@ -134,19 +152,13 @@ var Charsheet = Backbone.Model.extend();
 
 var user = new User({name:"Anonymous"});
 var chats = new Chats();
-var charsheet = new Charsheet();
-
-var module = {};
-var sheet = {};
+var charsheet = new Charsheet({module:{layout:""}, sheet:{}});
 
 $.getJSON("/ajax/module/Pathfinder",function(modjson){
-    module = modjson;
-    $.getJSON("/ajax/charsheet/Jamal/Bob",function(sheetjson){
-        charsheet.attributes = sheetjson;
-    })
+    charsheet.set({"module":modjson});
 })
-
-
-
+$.getJSON("/ajax/charsheet/Jamal/Bob",function(sheetjson){
+    charsheet.set({"sheet":sheetjson});
+})
 
 App.start();
