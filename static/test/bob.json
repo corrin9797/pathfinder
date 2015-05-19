@@ -1,0 +1,13 @@
+{
+    "User":"Jamal",
+    "Name":"Bob",
+    "Module":"Pathfinder Test",
+    "STR":10,
+    "DEX":11,
+    "CON":12,
+    "INT":13,
+    "WIS":14,
+    "CHA":15,
+    "Race":"Human",
+    "Human Racial Bonus":"CHA"
+}

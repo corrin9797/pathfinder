@@ -1,0 +1,55 @@
+{
+    "title":"Pathfinder",
+    "author":"yourmom",
+    "basestats": {
+        "Name": {"type":"str", "locked":false},
+        
+        "Player": {"type":"str", "locked":false},
+        
+        "STR": {"type":"int", "locked":false},
+        "DEX": {"type":"int", "locked":false},
+        "CON": {"type":"int", "locked":false},
+        "INT": {"type":"int", "locked":false},
+        "WIS": {"type":"int", "locked":false},
+        "CHA": {"type":"int", "locked":false},
+
+        "Race": { 
+            "type": "choice",
+            "locked": false,
+            "choice": {
+                "Human": {"unlock": ["Human Racial Bonus"],
+                          "modifier": {} },
+                "Dwarf": {"unlock": [],
+                          "modifier": {"STR":2, "CON":2, "DEX":-2} }
+            }
+        },
+
+        "Human Racial Bonus": {
+            "type": "choice",
+            "locked": true,
+            "choice": {
+                "STR": {"unlock": [],
+                        "modifier": {"STR":2} },
+                "DEX": {"unlock": [],
+                        "modifier": {"DEX":2} },
+                "CON": {"unlock": [],
+                        "modifier": {"CON":2} },
+                "INT": {"unlock": [],
+                        "modifier": {"INT":2} },
+                "WIS": {"unlock": [],
+                        "modifier": {"WIS":2} },
+                "CHA": {"unlock": [],
+                        "modifier": {"CHA":2} }
+            }
+        }
+    },
+
+    "derivedstats": {
+        "Melee To-Hit": {"type":"int", 
+                         "formula":"STR+DEX"}
+    },
+
+    "layout": "STR: {STR}<br>DEX: {DEX}<br>CON: {CON}<br>INT: {INT}<br>WIS: {WIS}<br>CHA: {CHA}<br><br>Race: {Race}<br>Human Racial Bonus: {Human Racial Bonus}<br><br>Melee To-Hit: {Melee To-Hit}<br>"
+}
+    
+    
