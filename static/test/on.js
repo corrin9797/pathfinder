@@ -110,7 +110,7 @@ App.CharsheetView = Marionette.ItemView.extend({
 
                 for (stat in module.derivedstats) {
                     //charstats[stat] = formulathingy(module.derivedStats[stat].formula,charstats);
-		    charstats[stat] = module.derivedstats[stat].formula;
+		    charstats[stat] = evaluate(module.derivedstats[stat].formula);
                 }
 
                 return strformat(module.layout, charstats);

@@ -1,37 +1,15 @@
-console.log("whassup")
-
-/*
-  We're gonna receive 2 json blobs, minimum
-
-  1) template (universal)
-  2) personal stats (player tied)
-
-  Things to do
-  * equation parsing
-  * take the template, put the personal stats in it and display
-  * make the personal stats editable
-
-  newStat(name, base?, mod? + other stuff)
-*/
-
 /*
   TODO LIST
   * merge all the checks into one function in ONE LOOP because otherwise it would just be gross
   * sort keys by length, longest first (so name overlap isn't a problem)
 */
 
-//TEST STATS
-var stats={
-    "STR":"9001",
-    "DEX":"2390478"
-}	
-
 var isNumber = function(string){
     return ("0123456789".indexOf(string) != -1 && string != "");
 }
 
 /*
-#######################################
+  #######################################
 ## Replacing stat names with numbers ##
 #######################################
 */
@@ -206,8 +184,17 @@ var convertCheck = function(string){
 	return string;
     }
     else {
-	return "THIS STRING WAS NOT VALID"
+	return "Error: Formula Invalid";
     }
+}
+
+var evaluate = function(string){
+    string = convertCheck(string);
+    if (string != "Error: Formula Invalid"){
+	return eval(string);
+    }
+    else{
+	return "Error: Formula Invalid"
 }
 
 string = "2 + 3 * (2/2)"
