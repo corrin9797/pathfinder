@@ -6,13 +6,12 @@
 
 var isNumber = function(string){
     return ("0123456789".indexOf(string) != -1 && string != "");
-}
+};
 
-/*
-  #######################################
-## Replacing stat names with numbers ##
-#######################################
-*/
+//#######################################
+//## Replacing stat names with numbers ##
+//#######################################
+
 //Takes a string (stringOriginal) and puts stringToAdd at index, removing a certain amount (toRemove) of letters
 var stringSplice = function(stringOriginal, index, toRemove, stringToAdd){
     tempString = stringOriginal.slice(0, index);
@@ -21,15 +20,15 @@ var stringSplice = function(stringOriginal, index, toRemove, stringToAdd){
     return tempString;
 }
 //replaces the FIRST instance of statName with its value
-var statSplice = function(stringOriginal, statName){
+var statSplice = function(stringOriginal, statName, stats){
     index = stringOriginal.indexOf(statName);
     toRemove = statName.length;
     stringToAdd = stats[statName] + " ";
-    stringOriginal = stringSplice(stringOriginal, index, toRemove, stringToAdd)
+    stringOriginal = stringSplice(stringOriginal, index, toRemove, stringToAdd);
     return stringOriginal;
 }
 //replaces ALL instances of statName with its value
-var statSpliceAll = function(stringOriginal, statName){
+var statSpliceAll = function(stringOriginal, statName, stats){
     while (stringOriginal.indexOf(statName) != -1){
 	stringOriginal = statSplice(stringOriginal, statName);
     }
@@ -37,22 +36,22 @@ var statSpliceAll = function(stringOriginal, statName){
 }
 //replaces all instances of all statnames from dictionary stats with their values
 //final form
-var replaceStats = function(stringOriginal){
+var replaceStats = function(stringOriginal, stats){
     for (var key in stats){
 	stringOriginal = statSpliceAll(stringOriginal, key);
     }
     return stringOriginal;
 }
 
-/*
-#####################################
-## Checking that a string is valid ##
-#####################################
-*/
+
+//#####################################
+//## Checking that a string is valid ##
+//#####################################
+
 //Checking that a string is nothing but +, -, /, *, and numbers
 var checkString = function(string){
     for (var i in string){
-	if ("1234567890+-*/() ".indexOf(string[i]) == -1){
+	if ("1234567890/+-*() ".indexOf(string[i]) == -1){
 	    console.log("inval char: " + string[i]);
 	    return false;
 	}
@@ -82,13 +81,14 @@ var checkParens = function(string){
     return true;
 }
 
+
 //Checking if operations have a number or close parens before them
 var checkOpBefore = function(string){
     var previous = "";
     var current = "";
     for (var i in string){
 	current = string[i];
-	if ("+-*/".indexOf(current) != -1){ //if current is an op
+	if ("*+-/".indexOf(current) != -1){ //if current is an op
 	    if (previous == ""){
 		console.log("Operation at beginning");
 		return false;
@@ -112,7 +112,7 @@ var checkOpAfter = function(string){
     var current = "";
     for (var i in string){
 	current = string[i];
-	if ("+-*/".indexOf(previous) != -1){ //if previous is an op
+	if ("*+-/".indexOf(previous) != -1){ //if previous is an op
 	    if (" 0123456789(".indexOf(current) == -1){
 		console.log("operation not followed by number");
 		return false;
@@ -122,7 +122,7 @@ var checkOpAfter = function(string){
 	    previous = string[i];
 	}
     }
-    if ("+-*/(".indexOf(previous) != -1 && previous != ""){ //if previous is still an operation (unresolved operation)
+    if ("*+-/(".indexOf(previous) != -1 && previous != ""){ //if previous is still an operation (unresolved operation)
 	console.log("|" + previous + "|" + current + "|");
 	console.log("unresolved operation");
 	return false;
@@ -172,14 +172,13 @@ var check = function(string){
     return (checkString(string) && checkParens(string) && checkOp(string) && checkFollow(string));
 }
 
-/*
-###########
-## Final ##
-###########
-*/
 
-var convertCheck = function(string){
-    string = replaceStats(string);
+//###########
+//## Final ##
+//###########
+
+var convertCheck = function(string, stats){
+    string = replaceStats(string, stats);
     if (check(string)) {
 	return string;
     }
@@ -188,18 +187,12 @@ var convertCheck = function(string){
     }
 }
 
-var evaluate = function(string){
-    string = convertCheck(string);
+var evaluate = function(string, stats){
+    string = convertCheck(string, stats);
     if (string != "Error: Formula Invalid"){
 	return eval(string);
     }
     else{
 	return "Error: Formula Invalid"
+    }
 }
-
-string = "2 + 3 * (2/2)"
-
-console.log(string)
-string = (convertCheck(string))
-console.log(string)
-console.log(eval(string))
