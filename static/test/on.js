@@ -1,10 +1,16 @@
 var App = new Marionette.Application();
 
+// Things that are new/untested are separated by #
+// -V
+
 App.addRegions({
     headReg: "#head-reg",
     nameReg: "#name-reg",
     chatReg: "#chat-reg",
-    charsheetReg: "#charsheet-reg"
+    charsheetReg: "#charsheet-reg",
+    //#############
+    newStatReg: "#new-stat"
+    //#############
 });
 
 App.on("start",function(){
@@ -20,6 +26,10 @@ App.on("start",function(){
     var charsheetView = new App.CharsheetView({model:charsheet});
     App.charsheetReg.show(charsheetView);
     
+    //#############
+    var newStatView = new App.
+    //#############
+
     Backbone.history.start();
     ajaxupdatechat();
 });
@@ -27,6 +37,35 @@ App.on("start",function(){
 App.HeadView = Marionette.ItemView.extend({
     template: "#head-template"
 });
+
+App.NewStatView = marionette.ItemView.extend({
+    template: "#new-stat-template",
+    tagname: "div",
+    events:{
+	"click #submit": function(){
+	    //AFTER WE FIX THE STAT ARRAY (GET RID OF DERIVEDSTATS) EVALUATE FUNCTION HERE   
+	    //var formula = $("#formula").val();
+	    //var result  = evaluate(formula);
+	    //var notError = !(result == "Error: Formula Invalid")
+	    var notError = true;
+	    if notError{
+		//tell them ok its submitted
+		//var name = $("#name")
+		//submit name, formula
+		//submit the damn thing
+	    }
+	    else{
+		//tell them screw you
+		//some error message or the other
+	    }
+	}
+    }
+    modelEvents: {
+        "change": function() {
+            this.render();
+        }
+    }
+})	
 
 App.NameView = Marionette.ItemView.extend({
     template: "#name-template",
@@ -80,13 +119,13 @@ App.ChatView = Marionette.CompositeView.extend({
                 $("#chattext").val("");
             }
         }
-    },
+    }
     modelEvents: {
         "change": function() {
             this.render();
         }
     }
-});
+);
 
 App.CharsheetView = Marionette.ItemView.extend({
     template: "#charsheet-template",
@@ -113,28 +152,15 @@ App.CharsheetView = Marionette.ItemView.extend({
 		    //returns int if formula valid, else returns "Error: Invalid Formula"
 		    charstats[stat] = module.derivedstats[stat].formula;
                 }
+		//hey lawrence put buttons on the do
+		//next to each stat
+		//events: pressing each button edits the stat FORMULA it's related to
                 return strformat(module.layout, charstats);
             }
         };
     },
     events: {
-        /*
-	  "click #namesetbutton": function(){
-          var newname = $("#nametext").val();
-          if (newname != "") {
-          this.model.set({name:newname});
-          }
-          },
-	  "keydown #nametext": function(e){
-            if (e.keyCode==13) {
-            var newname = $("#nametext").val();
-            if (newname != "") {
-            this.model.set({name:newname});
-            this.$("#nametext").focus();
-            }
-            }
-            }
-        */
+	//see above
     },
     modelEvents: {
 	"change":function(){
