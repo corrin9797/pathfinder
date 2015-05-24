@@ -69,7 +69,7 @@ App.ChatView = Marionette.CompositeView.extend({
             }
             $("#chattext").val("");
         },
-	"keydown #chattext": function(e){
+	    "keydown #chattext": function(e){
             if (e.keyCode==13) {
                 var newchat = $("#chattext").val();
                 if (newchat != "") {
@@ -181,11 +181,12 @@ App.CharsheetView = Marionette.ItemView.extend({
                     }
                 }
                 
-                return strformat(module.layout, charfinal);
+                return statformat(module.layout, charfinal);
             }
         };
     },
 	events: {
+        
 	},
 	modelEvents: {
 		"change":function(){
