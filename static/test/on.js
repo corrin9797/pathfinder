@@ -102,7 +102,6 @@ App.CharsheetView = Marionette.ItemView.extend({
                 sheet = this.attributes.sheet;
                 module = this.attributes.module;
                 
-<<<<<<< HEAD
                 var charstat = {} //character base stats
                 var charmod = {}  //character stat modifiers
                 
