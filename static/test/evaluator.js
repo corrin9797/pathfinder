@@ -30,7 +30,7 @@ var statSplice = function(stringOriginal, statName, stats){
 //replaces ALL instances of statName with its value
 var statSpliceAll = function(stringOriginal, statName, stats){
     while (stringOriginal.indexOf(statName) != -1){
-	stringOriginal = statSplice(stringOriginal, statName);
+	    stringOriginal = statSplice(stringOriginal, statName, stats);
     }
     return stringOriginal;
 }
@@ -38,7 +38,7 @@ var statSpliceAll = function(stringOriginal, statName, stats){
 //final form
 var replaceStats = function(stringOriginal, stats){
     for (var key in stats){
-	stringOriginal = statSpliceAll(stringOriginal, key);
+	    stringOriginal = statSpliceAll(stringOriginal, key, stats);
     }
     return stringOriginal;
 }
