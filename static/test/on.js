@@ -1,45 +1,44 @@
 var App = new Marionette.Application();
 
 App.addRegions({
-	headReg: "#head-reg",
-	nameReg: "#name-reg",
-	chatReg: "#chat-reg",
+    headReg: "#head-reg",
+    nameReg: "#name-reg",
+    chatReg: "#chat-reg",
     charsheetReg: "#charsheet-reg"
 });
 
 App.on("start",function(){
-	var headView = new App.HeadView();
-	App.headReg.show(headView);
+    var headView = new App.HeadView();
+    App.headReg.show(headView);
     
-	var nameView = new App.NameView({model:user});
-	App.nameReg.show(nameView);
+    var nameView = new App.NameView({model:user});
+    App.nameReg.show(nameView);
     
-	var chatView = new App.ChatView({collection:chats});
-	App.chatReg.show(chatView);
-
+    var chatView = new App.ChatView({collection:chats});
+    App.chatReg.show(chatView);
+    
     var charsheetView = new App.CharsheetView({model:charsheet});
     App.charsheetReg.show(charsheetView);
-
-	Backbone.history.start();
+    
+    Backbone.history.start();
     ajaxupdatechat();
 });
 
 App.HeadView = Marionette.ItemView.extend({
-	template: "#head-template"
+    template: "#head-template"
 });
 
 App.NameView = Marionette.ItemView.extend({
-	template: "#name-template",
-	tagName: "div",
-	events: {
-		"click #namesetbutton": function(){
+    template: "#name-template",
+    tagName: "div",
+    events: {
+	"click #namesetbutton": function(){
             var newname = $("#nametext").val();
             if (newname != "") {
-		
                 this.model.set({name:newname});
             }
         },
-		"keydown #nametext": function(e){
+	"keydown #nametext": function(e){
             if (e.keyCode==13) {
                 var newname = $("#nametext").val();
                 if (newname != "") {
@@ -48,11 +47,11 @@ App.NameView = Marionette.ItemView.extend({
                 }
             }
         }
-	},
-	modelEvents: {
-		"change":function(){
-			this.render();
-		}
+    },
+    modelEvents: {
+	"change":function(){
+	    this.render();
+	}
     }
 });
 
@@ -70,7 +69,7 @@ App.ChatView = Marionette.CompositeView.extend({
             }
             $("#chattext").val("");
         },
-		"keydown #chattext": function(e){
+	"keydown #chattext": function(e){
             if (e.keyCode==13) {
                 var newchat = $("#chattext").val();
                 if (newchat != "") {
@@ -90,8 +89,8 @@ App.ChatView = Marionette.CompositeView.extend({
 });
 
 App.CharsheetView = Marionette.ItemView.extend({
-	template: "#charsheet-template",
-	tagName: "div",
+    template: "#charsheet-template",
+    tagName: "div",
     serializeData: function() {
         var data = Backbone.Marionette.ItemView.prototype.serializeData.apply(this,arguments);
         data.attributes = this.model.attributes
@@ -103,6 +102,7 @@ App.CharsheetView = Marionette.ItemView.extend({
                 sheet = this.attributes.sheet;
                 module = this.attributes.module;
                 
+<<<<<<< HEAD
                 var charstat = {} //character base stats
                 var charmod = {}  //character stat modifiers
                 
@@ -166,7 +166,6 @@ App.CharsheetView = Marionette.ItemView.extend({
                 for (var statname in charstat) {
                     charfinal[statname] = charstat[statname].base;
                 }
-                
                 //apply modifiers
                 for (var modname in charmod) {
                     mod = charmod[modname];
@@ -175,7 +174,11 @@ App.CharsheetView = Marionette.ItemView.extend({
                         charfinal[effname] += effval;
                     }
                 }
-                
+                //evaluate derived stats
+                //charstats[stat] = formulathingy(module.derivedstats[stat].formula,charstats);
+		        //in evaluate.js
+		        //evaluate(formula string, array of all stats)
+		        //returns int if formula valid, else returns "Error: Invalid Formula"
                 
                 return strformat(module.layout, charfinal);
             }

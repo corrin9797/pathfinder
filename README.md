@@ -1,3 +1,5 @@
+stat page test
+=======
 # pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
@@ -6,7 +8,7 @@ Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 
 Lawrence - Server + mongo/json/sorta js
 
-Jessica - (CSS? + )mongo + flask
+Jessica - (CSS? + )mongo + flask + droplet stuff
 
 Vanessa - js/html
 
@@ -32,6 +34,9 @@ Timeline
 * Random dice generator (1 day)
 
 5/12/15 - elements: login present. using chat as basis for storage. working on adapting it to database structure required for project. working on js meant to show on the page itself.
+
+5/20/15 - ip address working eey
+<a href = "http://freedns.afraid.org/subdomain/">note to self</a>
 
 Database Structures
 
