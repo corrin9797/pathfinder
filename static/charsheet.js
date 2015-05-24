@@ -181,6 +181,10 @@ App.CharsheetView = Marionette.ItemView.extend({
                     }
                 }
                 
+                this.attributes.basestat = charstat;
+                this.attributes.modstat = charmod;
+                this.attributes.finalstat = charfinal;
+                
                 return statformat(module.layout, charfinal);
             }
         };
@@ -191,6 +195,21 @@ App.CharsheetView = Marionette.ItemView.extend({
 	modelEvents: {
 		"change":function(){
 			this.render();
+            var att = this.model.attributes;
+            
+            $(".statspan").tooltip({content:function(){
+                var r = "";
+                //console.log(att);
+                r += "Base: "+att.basestat[this.id].base+"<br>\n";
+                for (var modname in att.modstat) {
+                    var mod = att.modstat[modname];
+                    if (this.id in mod) {
+                        r += modname+": "+mod[this.id]+"<br>\n";
+                    }
+                } 
+                r += "Final: "+att.finalstat[this.id]+"<br>\n";
+                return r;
+            }});
 		}
     }
 });
@@ -204,7 +223,13 @@ var Charsheet = Backbone.Model.extend();
 
 var user = new User({name:"Anonymous"});
 var chats = new Chats();
-var charsheet = new Charsheet({module:{layout:""}, sheet:{}});
+var charsheet = new Charsheet({
+    module:{layout:""}, 
+    sheet:{},
+    basestat:{},
+    modstat:{},
+    finalstat:{}
+});
 
 $.getJSON("/ajax/module/Pathfinder",function(modjson){
     charsheet.set({"module":modjson});

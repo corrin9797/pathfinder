@@ -10,17 +10,16 @@ var strformat = function(s, c) {
 
 //strformat(s,c) except with extra bonus <span> magic
 //replacement format: 
-//{STR} -> <span class="statspan" id="STR">10</span>
+//{STR} -> <span class="statspan" id="STR" title="">10</span>
 var statformat = function(s, c) {
     return s.replace(/{(.+?)}/g, function(match, content) {
         if (!(content in c)) {
             return match;
         } else {
             var r = "";
-            r += "<span class=\"statspan\" "+"id=\""+content+"\">";
+            r += "<span class=\"statspan\" "+"id=\""+content+"\" title=\"\">";
             r += c[content];
             r += "</span>";
-            console.log(r);
             return r;
         }
     });
