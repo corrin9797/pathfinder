@@ -198,16 +198,41 @@ App.CharsheetView = Marionette.ItemView.extend({
             var att = this.model.attributes;
             
             $(".statspan").tooltip({content:function(){
+                var dbstat = att.module.stats[this.id];
                 var r = "";
-                //console.log(att);
-                r += "Base: "+att.basestat[this.id].base+"<br>\n";
-                for (var modname in att.modstat) {
-                    var mod = att.modstat[modname];
-                    if (this.id in mod) {
-                        r += modname+": "+mod[this.id]+"<br>\n";
+                if ("formula" in dbstat) {
+                    r += "Formula: "+dbstat.formula+"<br>\n";
+                    //maybe include the actual values later
+                } else if (dbstat.type == "int") {
+                    r += "Base: "+att.basestat[this.id].base+"<br>\n";
+                    for (var modname in att.modstat) {
+                        var mod = att.modstat[modname];
+                        if (this.id in mod) {
+                            r += modname+": "+mod[this.id]+"<br>\n";
+                        }
+                    } 
+                    r += "<br>Final: "+att.finalstat[this.id]+"<br>\n";
+                } else if (dbstat.type == "choice") {
+                    chc = dbstat.choice[this.innerHTML];
+                    if("modifier" in chc) {
+                        r += "Modifiers: <br>\n"
+                        r += "<ul>\n"
+                        var mod = chc.modifier;
+                        for (var eff in mod) {
+                            r += "<li>"+eff+": "+mod[eff]+"</li>\n";
+                        }
+                        r += "</ul>\n"
                     }
-                } 
-                r += "Final: "+att.finalstat[this.id]+"<br>\n";
+                    if("unlock" in chc) {
+                        r += "Unlocks: <br>\n"
+                        r += "<ul>\n"
+                        var unl = chc.unlock;
+                        for (var i in unl) {
+                            r += "<li>"+unl[i]+"</li>\n";
+                        }
+                        r += "</ul>\n"   
+                    }
+                }
                 return r;
             }});
 		}
