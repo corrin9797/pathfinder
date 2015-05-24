@@ -54,10 +54,9 @@ def test():
     print chatdb.find_one({"title":"test".replace("%20"," ")})
     return "hi"
 
-@app.route('/on_test')
+@app.route('/charsheet')
 def on_test():
-    initeverything() #sweet jesus why
-    return render_template("test/on_test.html")
+    return render_template("charsheet.html")
 
 @app.route("/ajax/chat/<channel>",methods=['GET','POST'])
 def ajax_chat(channel):
@@ -107,7 +106,7 @@ def initmoddb():
     #if not pmod:
     if True: #testy
         moddb.remove({}) #blood for the blood god
-        pjsonf = open("static/test/pathfinder.json")
+        pjsonf = open("static/json/pathfinder.json")
         pjson = json.load(pjsonf)
         pjsonf.close()
         moddb.insert(pjson)
@@ -118,7 +117,7 @@ def initsheetdb():
     #if not bob:
     if True: #testy
         sheetdb.remove({}) #blood for the blood god
-        bobjsonf = open("static/test/bob.json")
+        bobjsonf = open("static/json/bob.json")
         bobjson = json.load(bobjsonf)
         bobjsonf.close()
         sheetdb.insert(bobjson)

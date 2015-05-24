@@ -127,7 +127,7 @@ var checkOpAfter = function(string){
 	console.log("unresolved operation");
 	return false;
     }
-    console.log("returning true")
+    //console.log("returning true")
     return true;
 }
 

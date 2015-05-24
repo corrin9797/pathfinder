@@ -177,14 +177,9 @@ App.CharsheetView = Marionette.ItemView.extend({
                 for (var statname in charstat) {
                     dbstat = module.stats[statname];
                     if (dbstat && "formula" in dbstat) {
-                        console.log(dbstat);
                         charfinal[statname] = evaluate(dbstat.formula,charfinal);
                     }
                 }
-                //charstats[stat] = formulathingy(module.derivedstats[stat].formula,charstats);
-		        //in evaluate.js
-		        //evaluate(formula string, array of all stats)
-		        //returns int if formula valid, else returns "Error: Invalid Formula"
                 
                 return strformat(module.layout, charfinal);
             }
