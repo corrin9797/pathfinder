@@ -24,7 +24,13 @@
       <td>
         <div id="chat-reg"></div>
       </td>
-  </tr></table>
+    </tr>
+    <tr>
+      <td>
+	<div id="new-stat"></div>
+      </td>
+    </tr>
+  </table>
 
   <!-- script templates -->
   <script type="text/template" id="chat-template">
@@ -61,14 +67,21 @@
       <%= showStats() %>
     </div>
   </script>
-
+  
+  <script type="text/template" id="new-stat-template">
+    <div id="newstat">
+      <input type="text" id="name"></input>
+      <input type="text" id="formula"></input>
+      <input type="button" id="submit"></input>
+    </div>
+  </script>
+  
   <!-- page scripts -->
   <script src="static/evaluator.js"></script>
   <script src="static/strformat.js"></script>
   <script src="static/chat.js"></script>
   <script src="static/charsheet.js"></script>
   <!--
-  
   -->
 </body>
 </html>

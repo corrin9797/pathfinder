@@ -5,6 +5,9 @@ App.addRegions({
     nameReg: "#name-reg",
     chatReg: "#chat-reg",
     charsheetReg: "#charsheet-reg"
+    //#############
+    newStatReg: "#new-stat"
+    //#############
 });
 
 App.on("start",function(){
@@ -20,6 +23,10 @@ App.on("start",function(){
     var charsheetView = new App.CharsheetView({model:charsheet});
     App.charsheetReg.show(charsheetView);
     
+    //#############
+    //var newStatView = new App.NewStatView(SOMETHING HERE?)
+    //#############
+
     Backbone.history.start();
     ajaxupdatechat();
 });
@@ -27,6 +34,36 @@ App.on("start",function(){
 App.HeadView = Marionette.ItemView.extend({
     template: "#head-template"
 });
+
+App.NewStatView = marionette.ItemView.extend({
+    template: "#new-stat-template",
+    tagname: "div",
+    events:{
+	"click #submit": function(){
+	    //AFTER WE FIX THE STAT ARRAY (GET RID OF DERIVEDSTATS) EVALUATE FUNCTION HERE   
+	    //var formula = $("#formula").val();
+	    //var result  = evaluate(formula);
+	    //var notError = !(result == "Error: Formula Invalid")
+	    var notError = true;
+	    if notError{
+		//tell them ok its submitted
+		//var name = $("#name")
+		//submit name, formula
+		//submit the damn thing
+	    }
+	    else{
+		//tell them screw you
+		//some error message or the other
+	    }
+	}
+    }
+    modelEvents: {
+        "change": function() {
+            this.render();
+        }
+    }
+})	
+
 
 App.NameView = Marionette.ItemView.extend({
     template: "#name-template",
