@@ -1,7 +1,7 @@
 import random
-from pymongo import Connection
+from pymongo import MongoClient
 
-conn = Connection()
+conn = MongoClient()
 
 db = conn['1247']
 
