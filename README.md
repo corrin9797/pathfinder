@@ -3,7 +3,7 @@ stat page test
 # pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
-[project link]
+Link: <a href="http://stuypathfinder.mooo.com">http://stuypathfinder.mooo.com</a> (May not be running yet but it's set up)
 [project video???]
 
 Lawrence - Server + mongo/json/sorta js
@@ -36,7 +36,14 @@ Timeline
 5/12/15 - elements: login present. using chat as basis for storage. working on adapting it to database structure required for project. working on js meant to show on the page itself.
 
 5/20/15 - ip address working eey
-<a href = "http://freedns.afraid.org/subdomain/">note to self</a>
+<a href = "http://freedns.afraid.org/subdomain/">note to self</a> Continuing stat page stuff
+
+5/21/15 - got website working instead of studying for aps I'm so good
+
+5/22/15 - set up dns (stuypathfinder.mooo.com) and more stat page stuff
+
+5/23/15 - char page setup
+
 
 Database Structures
 
