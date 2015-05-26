@@ -4,7 +4,7 @@ App.addRegions({
     headReg: "#head-reg",
     nameReg: "#name-reg",
     chatReg: "#chat-reg",
-    charsheetReg: "#charsheet-reg"
+    charsheetReg: "#charsheet-reg",
     //#############
     newStatReg: "#new-stat"
     //#############
@@ -35,7 +35,7 @@ App.HeadView = Marionette.ItemView.extend({
     template: "#head-template"
 });
 
-App.NewStatView = marionette.ItemView.extend({
+App.NewStatView = Marionette.ItemView.extend({
     template: "#new-stat-template",
     tagname: "div",
     events:{
@@ -45,18 +45,18 @@ App.NewStatView = marionette.ItemView.extend({
 	    //var result  = evaluate(formula);
 	    //var notError = !(result == "Error: Formula Invalid")
 	    var notError = true;
-	    if notError{
+	    //if notError{
 		//tell them ok its submitted
 		//var name = $("#name")
 		//submit name, formula
 		//submit the damn thing
-	    }
-	    else{
+	    //}
+	    //else{
 		//tell them screw you
 		//some error message or the other
-	    }
+	    //}
 	}
-    }
+    },
     modelEvents: {
         "change": function() {
             this.render();
