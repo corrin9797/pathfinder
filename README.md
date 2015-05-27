@@ -1,5 +1,3 @@
-stat page test
-=======
 # pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
@@ -10,9 +8,9 @@ Lawrence - Server + mongo/json/sorta js
 
 Jessica - (CSS? + )mongo + flask + droplet stuff
 
-Vanessa - js/html
+Vanessa - js/html (w/ Corrin)
 
-Corrin - js/html
+Corrin - js/html (w/ Vanessa)
 
 idek????
 
