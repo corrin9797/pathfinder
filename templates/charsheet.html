@@ -64,8 +64,12 @@
 
   <script type="text/template" id="charsheet-template">
     <div id="statdisplay">
-      <%= showStats() %>
+      <!--%= showStats() %-->
     </div>
+  </script>
+  
+  <script type="text/template" id="stat-template">
+    <%= name %>: <span class="statspan" id="<%= name %>" title=""> <%= value %></span>
   </script>
   
   <script type="text/template" id="new-stat-template">
