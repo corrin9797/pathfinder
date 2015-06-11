@@ -1,9 +1,27 @@
+//defined in charsheet.html, passed from url via flask template
+//var SHEET_ID = {{sheetid}} 
+
 function ajaxupdatestat() {
-    console.log("ajaxupdatestat");
+    $.getJSON("/ajax/charsheet/"+SHEET_ID,function(sheetjson){
+        charsheet.set({"sheet":sheetjson});
+    });
 }
 
+//SECURITY NIGHTMARE, AYY
 function ajaxsendstat(statname, value) {
-    console.log("ajaxsendstat",statname,value);
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/ajax/charsheet/"+SHEET_ID,
+        data: JSON.stringify({
+            statname: statname,
+            newvalue: value
+        }),
+        dataType: "json",
+        success: function(r){
+            ajaxupdatestat()
+        }
+    });
 }
 
 var App = new Marionette.Application();
@@ -142,6 +160,8 @@ App.StatView = Marionette.ItemView.extend({
             var statname = e.model.attributes.name;
             var span = $(".statspan#"+statname)[0];
             span.className = "statchange";
+            //NOTE: MAKE IT DISPLAY BASE STAT BY DEFAULT
+            //DISPLAY TOOLTIP FOR MODIFIERS AND WHATEVER TOO
             span.innerHTML = '<input type="text" value="'+span.innerHTML+'">';
             this.$("input").focus();
             //how to move cursor to end of text box?
@@ -179,7 +199,7 @@ App.StatView = Marionette.ItemView.extend({
 });
 
 
-
+//NOTE: UNBREAK LAYOUTS
 App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
     childView: App.StatView,
@@ -203,7 +223,6 @@ App.CharsheetView = Marionette.CompositeView.extend({
     },
     childEvents: {
         regenSheet:function(e) {
-            console.log(e);
             this.regenModel();
             this.render();
         }
@@ -376,8 +395,6 @@ var charsheet = new Charsheet({
 $.getJSON("/ajax/module/Pathfinder",function(modjson){
     charsheet.set({"module":modjson});
 })
-$.getJSON("/ajax/charsheet/Jamal/Bob",function(sheetjson){
-    charsheet.set({"sheet":sheetjson});
-})
+ajaxupdatestat();
 
 App.start();
