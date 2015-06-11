@@ -1,3 +1,11 @@
+function ajaxupdatestat() {
+    console.log("ajaxupdatestat");
+}
+
+function ajaxsendstat(statname, value) {
+    console.log("ajaxsendstat",statname,value);
+}
+
 var App = new Marionette.Application();
 
 App.addRegions({
@@ -20,7 +28,8 @@ App.on("start",function(){
     var chatView = new App.ChatView({collection:chats});
     App.chatReg.show(chatView);
     
-    var charsheetView = new App.CharsheetView({model:charsheet});
+    var charsheetView = new App.CharsheetView({model:charsheet, 
+                                               collection:stats});
     App.charsheetReg.show(charsheetView);
     
     //#############
@@ -125,9 +134,60 @@ App.ChatView = Marionette.CompositeView.extend({
     }
 });
 
-App.CharsheetView = Marionette.ItemView.extend({
+App.StatView = Marionette.ItemView.extend({
+    template: "#stat-template",
+    initialize: function() {
+        var that = this; //jesus christ
+        this.on("statspanevent",function(e) {
+            var statname = e.model.attributes.name;
+            var span = $(".statspan#"+statname)[0];
+            span.className = "statchange";
+            span.innerHTML = '<input type="text" value="'+span.innerHTML+'">';
+            this.$("input").focus();
+            //how to move cursor to end of text box?
+        });
+    },
+    triggers: {
+        "click .statspan": "statspanevent"
+    },
+    events: {
+        "keypress .statchange": "statchangeevent"
+    },
+    statchangeevent: function(e) {
+        if (e.keyCode==13) {
+            var span = e.currentTarget;
+            var instr = e.target.value;
+            var invalue = +instr; //don't try this at home, kids
+            //http://stackoverflow.com/questions/175739/is-there-a-built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
+            //NOTE: ONLY WORKS FOR NUMBER STATS ATM
+            //MAKE IT DO CHOICE/STRING STATS TOO LATER
+            if (instr!="" && !isNaN(invalue)) {
+                this.model.set({value: invalue});
+                statname = span.attributes.id.value;
+                ajaxsendstat(statname, invalue);
+                span.className = "statspan";
+                span.innerHTML = invalue;
+            }
+        }
+    },
+    modelEvents: {
+        "change": function() {
+            this.render();
+            this.triggerMethod("regenSheet");
+        }
+    }
+});
+
+
+
+App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
-    tagName: "div",
+    childView: App.StatView,
+    childViewContainer: "div",
+    initialize: function() {
+    },
+    triggers: {
+    },
     serializeData: function() {
         var data = Backbone.Marionette.ItemView.prototype.serializeData.apply(this,arguments);
         data.attributes = this.model.attributes
@@ -136,108 +196,121 @@ App.CharsheetView = Marionette.ItemView.extend({
     templateHelpers: function() {
         return {
             showStats: function() {
-                sheet = this.attributes.sheet;
-                module = this.attributes.module;
-                
-                var charstat = {} //character base stats
-                var charmod = {}  //character stat modifiers
-                
-                
-                //init charstat from module
-                for (var statname in module.stats) {
-                    var stat = module.stats[statname];
-                    var newstat = {}
-                    newstat.type = stat.type;
-                    newstat.lock = ("locked" in stat) ? stat["locked"] : false;
-                    
-
-                    if (stat.type=="int") {
-                        newstat.base = 0;
-                    } else if (stat.type=="str") {
-                        newstat.base = "[STRING]";
-                    } else if (stat.type=="choice") {
-                        newstat.base = "[CHOICE]";
-                    } else {
-                        //this shouldn't happen
-                        newstat.base = "[WHAT]";
-                    }
-
-                    charstat[statname] = newstat;
-                }
-
-                //populate charstat with sheet values
-                for (var statname in sheet) {
-                    var val = sheet[statname]
-                    if (!(statname in charstat)) {
-                        charstat[statname] = {"type":"?"};
-                    }
-                    charstat[statname].base = val;
-                    
-                    if (charstat[statname].type=="choice") {
-                        var dbstat = module.stats[statname].choice[val];
-                        
-                        //unlock appropriate stats
-                        if ("unlock" in dbstat) {
-                            for (var ustat in dbstat.unlock) {
-                                ustat = dbstat.unlock[ustat]; //mfwjs
-                                charstat[ustat].lock = false;
-                            }
-                        }
-                        
-                        //add modifiers to list
-                        if ("modifier" in dbstat) {
-                            var newmod = {};
-                            for (var effname in dbstat.modifier) {
-                                var val = dbstat.modifier[effname];
-                                newmod[effname] = val;
-                            }
-                            charmod[statname] = newmod;
-                        }   
-                    }   
-                }
-                
-                //generate final stats
-                var charfinal = {};
-                //copy base stats
-                for (var statname in charstat) {
-                    charfinal[statname] = charstat[statname].base;
-                }
-                //apply modifiers
-                for (var modname in charmod) {
-                    mod = charmod[modname];
-                    for (var effname in mod) {
-                        effval = mod[effname];
-                        charfinal[effname] += effval;
-                    }
-                }
-                //evaluate derived stats
-                for (var statname in charstat) {
-                    dbstat = module.stats[statname];
-                    if (dbstat && "formula" in dbstat) {
-                        charfinal[statname] = evaluate(dbstat.formula,charfinal);
-                    }
-                }
-                
-                this.attributes.basestat = charstat;
-                this.attributes.modstat = charmod;
-                this.attributes.finalstat = charfinal;
-                
-                return statformat(module.layout, charfinal);
+                return statformat(this.module.layout, 
+                                  this.finalstat);
             }
         };
     },
-	events: {
+    childEvents: {
+        regenSheet:function(e) {
+            console.log(e);
+            this.regenModel();
+            this.render();
+        }
+    },
+    regenModel: function() {
+        var att = this.model.attributes;
+        var charstat = {} //character base stats
+        var charmod = {}  //character stat modifiers
         
-	},
+        //init charstat from module
+        for (var statname in att.module.stats) {
+            var stat = att.module.stats[statname];
+            var newstat = {}
+            newstat.type = stat.type;
+            newstat.lock = ("locked" in stat) ? stat["locked"] : false;
+            
+
+            if (stat.type=="int") {
+                newstat.base = 0;
+            } else if (stat.type=="str") {
+                newstat.base = "[STRING]";
+            } else if (stat.type=="choice") {
+                newstat.base = "[CHOICE]";
+            } else {
+                //this shouldn't happen
+                newstat.base = "[WHAT]";
+            }
+
+            charstat[statname] = newstat;
+        }
+
+        //populate charstat with sheet values
+        for (var statname in att.sheet) {
+            var val = att.sheet[statname]
+            if (!(statname in charstat)) {
+                charstat[statname] = {"type":"?"};
+            }
+            charstat[statname].base = val;
+            
+            if (charstat[statname].type=="choice") {
+                var dbstat = att.module.stats[statname].choice[val];
+                
+                //unlock appropriate stats
+                if ("unlock" in dbstat) {
+                    for (var ustat in dbstat.unlock) {
+                        ustat = dbstat.unlock[ustat]; //mfwjs
+                        charstat[ustat].lock = false;
+                    }
+                }
+                
+                //add modifiers to list
+                if ("modifier" in dbstat) {
+                    var newmod = {};
+                    for (var effname in dbstat.modifier) {
+                        var val = dbstat.modifier[effname];
+                        newmod[effname] = val;
+                    }
+                    charmod[statname] = newmod;
+                }   
+            }   
+        }
+        
+        //generate final stats
+        var charfinal = {};
+        //copy base stats
+        for (var statname in charstat) {
+            charfinal[statname] = charstat[statname].base;
+        }
+        //apply modifiers
+        for (var modname in charmod) {
+            mod = charmod[modname];
+            for (var effname in mod) {
+                effval = mod[effname];
+                charfinal[effname] += effval;
+            }
+        }
+        //evaluate derived stats
+        for (var statname in charstat) {
+            dbstat = att.module.stats[statname];
+            if (dbstat && "formula" in dbstat) {
+                charfinal[statname] = evaluate(dbstat.formula,charfinal);
+            }
+        }
+        //regenerate collection
+        this.collection.reset();
+        for (var statname in charfinal) {
+            if(statname in att.module.stats) {
+                news = new Stat({name:statname, 
+                                 value:charfinal[statname]});
+                this.collection.add(news);
+            }
+        }
+        
+        this.model.set({basestat:charstat});
+        this.model.set({modstat:charmod});
+        this.model.set({finalstat:charfinal});
+    },
 	modelEvents: {
 		"change":function(){
-			this.render();
-            var att = this.model.attributes;
+            this.regenModel();
+            this.render();
             
+            var att = this.model.attributes;
             $(".statspan").tooltip({content:function(){
                 var dbstat = att.module.stats[this.id];
                 var r = "";
-                if ("formula" in dbstat) {
+                if (dbstat && "formula" in dbstat) {
                     r += "Formula: "+dbstat.formula+"<br>\n";
                     //maybe include the actual values later
                 } else if (dbstat.type == "int") {
@@ -250,7 +323,7 @@ App.CharsheetView = Marionette.ItemView.extend({
                     } 
                     r += "<br>Final: "+att.finalstat[this.id]+"<br>\n";
                 } else if (dbstat.type == "choice") {
-                    chc = dbstat.choice[this.innerHTML];
+                    chc = dbstat.choice[att.basestat[this.id].base];
                     if("modifier" in chc) {
                         r += "Modifiers: <br>\n"
                         r += "<ul>\n"
@@ -281,10 +354,17 @@ var Message = Backbone.Model.extend();
 var Chats = Backbone.Collection.extend({
     model:Message
 });
-var Charsheet = Backbone.Model.extend();
+
+var Stat = Backbone.Model.extend();
+var Stats = Backbone.Collection.extend({
+    model:Stat
+});
+var Charsheet = Backbone.Model.extend({});
 
 var user = new User({name:"Anonymous"});
 var chats = new Chats();
+
+var stats = new Stats();
 var charsheet = new Charsheet({
     module:{layout:""}, 
     sheet:{},
