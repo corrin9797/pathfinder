@@ -8,7 +8,7 @@ db = conn['1247']
 
 def restart():
     db.usertable.drop()
-    tdic = {'username': 'testing', 'password':'testing'}
+    tdic = {'username': 'testing', 'password':'testing', 'IDs':''}
     db.usertable.insert(tdic)   
 
 def printData():
@@ -55,3 +55,18 @@ def updateUser(usernamei, passwordi, passwordn):
         return True
     return False
     
+def addID (username, idnum):
+    cres = db.usertable.find({'username':username})
+    res = [r for r in cres]
+    old = res[0]["IDs"]
+    if old == "":
+        new = str(idnum)
+    else:
+        new = old + "," + str(idnum)
+    db.usertable.update ({'username':username}, {"$set": {'IDs':new}})
+
+
+def getIDs (username):
+    cres = db.usertable.find({'username':username})
+    res = [r for r in cres][0]
+    return res["IDs"].encode("ascii").split(",") 
