@@ -11,6 +11,8 @@ var strformat = function(s, c) {
 //strformat(s,c) except with extra bonus <span> magic
 //replacement format: 
 //{STR} -> <span class="statspan" id="STR" title="">10</span>
+//
+//NO LONGER USED BECAUSE MARIONETTE IS A THING
 var statformat = function(s, c) {
     return s.replace(/{(.+?)}/g, function(match, content) {
         if (!(content in c)) {

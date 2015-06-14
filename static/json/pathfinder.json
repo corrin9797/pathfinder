@@ -1,10 +1,7 @@
 {
     "title":"Pathfinder",
     "author":"yourmom",
-    "stats": {
-        "Name": {"type":"str"},
-        
-        "User": {"type":"str"},
+    "stats": {"Name": {"type":"str"},
         
         "STR": {"type":"int"},
         "DEX": {"type":"int"},
@@ -15,23 +12,23 @@
 
         "Race": { 
             "type": "choice",
-            "choice": {
-                "Human": {"unlock": ["Human Racial Bonus"]},
-                "Dwarf": {"modifier": {"STR":2, "CON":2, "DEX":-2} }
-            }
+            "choice": [
+                {"name":"Human", "unlock": ["Human Racial Bonus"]},
+                {"name":"Dwarf", "modifier": {"STR":2, "CON":2, "DEX":-2} }
+            ]
         },
 
         "Human Racial Bonus": {
             "type": "choice",
             "locked": true,
-            "choice": {
-                "STR": {"modifier": {"STR":2} },
-                "DEX": {"modifier": {"DEX":2} },
-                "CON": {"modifier": {"CON":2} },
-                "INT": {"modifier": {"INT":2} },
-                "WIS": {"modifier": {"WIS":2} },
-                "CHA": {"modifier": {"CHA":2} }
-            }
+            "choice": [
+                {"name":"STR", "modifier": {"STR":2} },
+                {"name":"DEX", "modifier": {"DEX":2} },
+                {"name":"CON", "modifier": {"CON":2} },
+                {"name":"INT", "modifier": {"INT":2} },
+                {"name":"WIS", "modifier": {"WIS":2} },
+                {"name":"CHA", "modifier": {"CHA":2} }
+            ]
         },
         
         "Melee To-Hit": {
@@ -41,10 +38,9 @@
 
     },
 
-    "layout": ["User","Name",
+    "layout": ["Name",0,
                "Race","Human Racial Bonus",
                "STR","DEX","CON","INT","WIS","CHA",
                "Melee To-Hit"]
 }
-    
     

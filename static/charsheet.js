@@ -155,14 +155,40 @@ App.ChatView = Marionette.CompositeView.extend({
 App.StatView = Marionette.ItemView.extend({
     template: "#stat-template",
     initialize: function() {
-        var that = this; //jesus christ
+        var att = this.model.attributes
+        var stattype = att.type;
+        var formula = att.formula;
+        
         this.on("statspanevent",function(e) {
+            if (att.nochange) {return;}
             var statname = e.model.attributes.name;
-            var span = $(".statspan#"+statname)[0];
+            var span=$("span[id='"+statname+"'][class=statspan]")[0];
             span.className = "statchange";
-            //NOTE: MAKE IT DISPLAY BASE STAT BY DEFAULT
-            //DISPLAY TOOLTIP FOR MODIFIERS AND WHATEVER TOO
-            span.innerHTML = '<input type="text" value="'+span.innerHTML+'">';
+            if (stattype == "int" && !formula) {
+                spanstr = '<input type="text" value="'+att.baseval+'">';
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } else if (stattype == "str") {
+                spanstr = '<input type="text" value="'+att.baseval+'">';
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } else if (stattype == "choice") {
+                spanstr = "<select>";
+                for (var i=0; i<att.choices.length; i++) {
+                    var c = att.choices[i];
+                    if (c.name == att.baseval) {
+                        spanstr += "<option selected='selected' ";
+                        spanstr += "value='"+c.name+"'>";
+                        spanstr += c.name+"</option>";
+                    } else {
+                        spanstr += "<option value='"+c.name+"'>";
+                        spanstr += c.name+"</option>";
+                    }
+                }
+                spanstr += "</select>";
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } 
             this.$("input").focus();
             //how to move cursor to end of text box?
         });
@@ -171,23 +197,51 @@ App.StatView = Marionette.ItemView.extend({
         "click .statspan": "statspanevent"
     },
     events: {
-        "keypress .statchange": "statchangeevent"
+        "keypress .statchange": "statchangeevent",
+        "click .submitstat": "statsubmitevent"
+    },
+    submitstat: function(span) {
+        var att = this.model.attributes;
+
+        var statname = span.attributes.id.value;
+        var instr = span.children[0].value; //dear god why
+        
+        if (att.type == "int") {
+            var invalue = +instr; //don't try this at home, kids
+            //if instr does not represent number, invalue->NaN
+            // ^^^ http://stackoverflow.com/questions/175739/
+            if (instr!="" && !isNaN(invalue)) {
+                span.className = "statspan";
+                span.innerHTML = invalue;
+                this.model.set({value: invalue});
+                ajaxsendstat(statname, invalue);
+            }
+        } else if (att.type == "str") {
+            if (instr!="") {
+                span.className = "statspan";
+                span.innerHTML = instr;
+                this.model.set({value: instr});
+                ajaxsendstat(statname, instr);
+            }
+        } else if (att.type == "choice") {
+            span.className = "statspan";
+            span.innerHTML = instr;
+            this.model.set({value: instr});
+            ajaxsendstat(statname, instr);
+        }
+    },
+    statsubmitevent: function(e) {
+        var span = e.target.parentElement;
+        //var statname = span.attributes.id.value;
+        //var instr = e.target.value;
+        this.submitstat(span);
     },
     statchangeevent: function(e) {
         if (e.keyCode==13) {
             var span = e.currentTarget;
-            var instr = e.target.value;
-            var invalue = +instr; //don't try this at home, kids
-            //http://stackoverflow.com/questions/175739/is-there-a-built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
-            //NOTE: ONLY WORKS FOR NUMBER STATS ATM
-            //MAKE IT DO CHOICE/STRING STATS TOO LATER
-            if (instr!="" && !isNaN(invalue)) {
-                this.model.set({value: invalue});
-                statname = span.attributes.id.value;
-                ajaxsendstat(statname, invalue);
-                span.className = "statspan";
-                span.innerHTML = invalue;
-            }
+            //var statname = span.attributes.id.value;
+            //var instr = e.target.value;
+            this.submitstat(span);
         }
     },
     modelEvents: {
@@ -211,14 +265,6 @@ App.CharsheetView = Marionette.CompositeView.extend({
         data.attributes = this.model.attributes
         return data;
     },
-    templateHelpers: function() {
-        return {
-            showStats: function() {
-                return statformat(this.module.layout, 
-                                  this.finalstat);
-            }
-        };
-    },
     childEvents: {
         regenSheet:function(e) {
             this.regenModel();
@@ -227,12 +273,15 @@ App.CharsheetView = Marionette.CompositeView.extend({
     },
     regenModel: function() {
         var att = this.model.attributes;
+        var module = att.module;
+        var sheet = att.sheet;
+        
         var charstat = {} //character base stats
         var charmod = {}  //character stat modifiers
 
         //init charstat from module
-        for (var statname in att.module.stats) {
-            var stat = att.module.stats[statname];
+        for (var statname in module.stats) {
+            var stat = module.stats[statname];
             var newstat = {}
             newstat.type = stat.type;
             newstat.lock = ("locked" in stat) ? stat["locked"] : false;
@@ -253,16 +302,20 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
 
         //populate charstat with sheet values
-        for (var statname in att.sheet) {
-            var val = att.sheet[statname]
+        for (var statname in sheet) {
+            var val = sheet[statname]
             if (!(statname in charstat)) {
                 charstat[statname] = {"type":"?"};
             }
             charstat[statname].base = val;
             
             if (charstat[statname].type=="choice") {
-                var dbstat = att.module.stats[statname].choice[val];
-                
+                var choices = module.stats[statname].choice
+                var dbstat = {};
+                for (var i=0; i<choices.length; i++) {
+                    var c = choices[i];
+                    if(c.name==val) {dbstat = c; break;}
+                }
                 //unlock appropriate stats
                 if ("unlock" in dbstat) {
                     for (var ustat in dbstat.unlock) {
@@ -299,20 +352,29 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
         //evaluate derived stats
         for (var statname in charstat) {
-            dbstat = att.module.stats[statname];
+            dbstat = module.stats[statname];
             if (dbstat && "formula" in dbstat) {
                 charfinal[statname] = evaluate(dbstat.formula,charfinal);
             }
         }
         //regenerate collection
         this.collection.reset();
-        var layout = att.module.layout;
+        var layout = module.layout;
         for (var i=0; i<layout.length; i++) {
             statname = layout[i];
-            if(statname in att.module.stats) {
-                news = new Stat({line:i,
-                                 name:statname, 
-                                 value:charfinal[statname]});
+            if(statname in module.stats) {
+                choices = module.stats[statname].choice
+                news = new Stat({
+                    line:     i,
+                    name:     statname, 
+                    type:     module.stats[statname].type,
+                    formula:  module.stats[statname].formula,
+                    nochange: statname=="User", //lmao
+                    
+                    baseval:  charstat[statname].base,
+                    finalval: charfinal[statname],
+                    choices:  module.stats[statname].choice
+                });
                 this.collection.add(news);
             }
         }
@@ -348,7 +410,13 @@ App.CharsheetView = Marionette.CompositeView.extend({
                     r += "<br>Final: "+att.finalstat[this.id]+"<br>";
                     r += "<br>Click to edit base value";
                 } else if (dbstat.type == "choice") {
-                    chc = dbstat.choice[att.basestat[this.id].base];
+                    var chc = {};
+                    for (var i=0; i<dbstat.choice.length; i++) {
+                        var c = dbstat.choice[i];
+                        if(c.name==att.basestat[this.id].base) {
+                            chc = c; break;
+                        }
+                    }
                     if("modifier" in chc) {
                         r += "Modifiers: <br>"
                         r += "<ul>\n"
