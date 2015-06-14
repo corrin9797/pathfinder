@@ -96,13 +96,13 @@ App.NameView = Marionette.ItemView.extend({
     template: "#name-template",
     tagName: "div",
     events: {
-	"click #namesetbutton": function(){
+	    "click #namesetbutton": function(){
             var newname = $("#nametext").val();
             if (newname != "") {
                 this.model.set({name:newname});
             }
         },
-	"keydown #nametext": function(e){
+	    "keydown #nametext": function(e){
             if (e.keyCode==13) {
                 var newname = $("#nametext").val();
                 if (newname != "") {
@@ -155,14 +155,40 @@ App.ChatView = Marionette.CompositeView.extend({
 App.StatView = Marionette.ItemView.extend({
     template: "#stat-template",
     initialize: function() {
-        var that = this; //jesus christ
+        var att = this.model.attributes
+        var stattype = att.type;
+        var formula = att.formula;
+        
         this.on("statspanevent",function(e) {
+            if (att.nochange) {return;}
             var statname = e.model.attributes.name;
-            var span = $(".statspan#"+statname)[0];
+            var span=$("span[id='"+statname+"'][class=statspan]")[0];
             span.className = "statchange";
-            //NOTE: MAKE IT DISPLAY BASE STAT BY DEFAULT
-            //DISPLAY TOOLTIP FOR MODIFIERS AND WHATEVER TOO
-            span.innerHTML = '<input type="text" value="'+span.innerHTML+'">';
+            if (stattype == "int" && !formula) {
+                spanstr = '<input type="text" value="'+att.baseval+'">';
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } else if (stattype == "str") {
+                spanstr = '<input type="text" value="'+att.baseval+'">';
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } else if (stattype == "choice") {
+                spanstr = "<select>";
+                for (var i=0; i<att.choices.length; i++) {
+                    var c = att.choices[i];
+                    if (c.name == att.baseval) {
+                        spanstr += "<option selected='selected' ";
+                        spanstr += "value='"+c.name+"'>";
+                        spanstr += c.name+"</option>";
+                    } else {
+                        spanstr += "<option value='"+c.name+"'>";
+                        spanstr += c.name+"</option>";
+                    }
+                }
+                spanstr += "</select>";
+                spanstr += "<button class='submitstat'>Submit</button>";
+                span.innerHTML = spanstr;
+            } 
             this.$("input").focus();
             //how to move cursor to end of text box?
         });
@@ -171,23 +197,51 @@ App.StatView = Marionette.ItemView.extend({
         "click .statspan": "statspanevent"
     },
     events: {
-        "keypress .statchange": "statchangeevent"
+        "keypress .statchange": "statchangeevent",
+        "click .submitstat": "statsubmitevent"
+    },
+    submitstat: function(span) {
+        var att = this.model.attributes;
+
+        var statname = span.attributes.id.value;
+        var instr = span.children[0].value; //dear god why
+        
+        if (att.type == "int") {
+            var invalue = +instr; //don't try this at home, kids
+            //if instr does not represent number, invalue->NaN
+            // ^^^ http://stackoverflow.com/questions/175739/
+            if (instr!="" && !isNaN(invalue)) {
+                span.className = "statspan";
+                span.innerHTML = invalue;
+                this.model.set({value: invalue});
+                ajaxsendstat(statname, invalue);
+            }
+        } else if (att.type == "str") {
+            if (instr!="") {
+                span.className = "statspan";
+                span.innerHTML = instr;
+                this.model.set({value: instr});
+                ajaxsendstat(statname, instr);
+            }
+        } else if (att.type == "choice") {
+            span.className = "statspan";
+            span.innerHTML = instr;
+            this.model.set({value: instr});
+            ajaxsendstat(statname, instr);
+        }
+    },
+    statsubmitevent: function(e) {
+        var span = e.target.parentElement;
+        //var statname = span.attributes.id.value;
+        //var instr = e.target.value;
+        this.submitstat(span);
     },
     statchangeevent: function(e) {
         if (e.keyCode==13) {
             var span = e.currentTarget;
-            var instr = e.target.value;
-            var invalue = +instr; //don't try this at home, kids
-            //http://stackoverflow.com/questions/175739/is-there-a-built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
-            //NOTE: ONLY WORKS FOR NUMBER STATS ATM
-            //MAKE IT DO CHOICE/STRING STATS TOO LATER
-            if (instr!="" && !isNaN(invalue)) {
-                this.model.set({value: invalue});
-                statname = span.attributes.id.value;
-                ajaxsendstat(statname, invalue);
-                span.className = "statspan";
-                span.innerHTML = invalue;
-            }
+            //var statname = span.attributes.id.value;
+            //var instr = e.target.value;
+            this.submitstat(span);
         }
     },
     modelEvents: {
@@ -198,8 +252,6 @@ App.StatView = Marionette.ItemView.extend({
     }
 });
 
-
-//NOTE: UNBREAK LAYOUTS
 App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
     childView: App.StatView,
@@ -213,14 +265,6 @@ App.CharsheetView = Marionette.CompositeView.extend({
         data.attributes = this.model.attributes
         return data;
     },
-    templateHelpers: function() {
-        return {
-            showStats: function() {
-                return statformat(this.module.layout, 
-                                  this.finalstat);
-            }
-        };
-    },
     childEvents: {
         regenSheet:function(e) {
             this.regenModel();
@@ -229,12 +273,15 @@ App.CharsheetView = Marionette.CompositeView.extend({
     },
     regenModel: function() {
         var att = this.model.attributes;
+        var module = att.module;
+        var sheet = att.sheet;
+        
         var charstat = {} //character base stats
         var charmod = {}  //character stat modifiers
-        
+
         //init charstat from module
-        for (var statname in att.module.stats) {
-            var stat = att.module.stats[statname];
+        for (var statname in module.stats) {
+            var stat = module.stats[statname];
             var newstat = {}
             newstat.type = stat.type;
             newstat.lock = ("locked" in stat) ? stat["locked"] : false;
@@ -255,15 +302,23 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
 
         //populate charstat with sheet values
-        for (var statname in att.sheet) {
-            var val = att.sheet[statname]
+        for (var statname in sheet) {
+            if (!(charstat[statname])) {continue;}
+            if (charstat[statname].lock) {continue;}
+            
+            var val = sheet[statname]
             if (!(statname in charstat)) {
                 charstat[statname] = {"type":"?"};
             }
             charstat[statname].base = val;
             
             if (charstat[statname].type=="choice") {
-                var dbstat = att.module.stats[statname].choice[val];
+                var choices = module.stats[statname].choice
+                var dbstat = {};
+                for (var i=0; i<choices.length; i++) {
+                    var c = choices[i];
+                    if(c.name==val) {dbstat = c; break;}
+                }
                 
                 //unlock appropriate stats
                 if ("unlock" in dbstat) {
@@ -301,17 +356,29 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
         //evaluate derived stats
         for (var statname in charstat) {
-            dbstat = att.module.stats[statname];
+            dbstat = module.stats[statname];
             if (dbstat && "formula" in dbstat) {
                 charfinal[statname] = evaluate(dbstat.formula,charfinal);
             }
         }
         //regenerate collection
         this.collection.reset();
-        for (var statname in charfinal) {
-            if(statname in att.module.stats) {
-                news = new Stat({name:statname, 
-                                 value:charfinal[statname]});
+        var layout = module.layout;
+        for (var i=0; i<layout.length; i++) {
+            statname = layout[i];
+            if(statname in module.stats && !charstat[statname].lock) {
+                choices = module.stats[statname].choice
+                news = new Stat({
+                    line:     i,
+                    name:     statname, 
+                    type:     module.stats[statname].type,
+                    formula:  module.stats[statname].formula,
+                    nochange: statname=="User", //lmao
+                    
+                    baseval:  charstat[statname].base,
+                    finalval: charfinal[statname],
+                    choices:  module.stats[statname].choice
+                });
                 this.collection.add(news);
             }
         }
@@ -325,6 +392,8 @@ App.CharsheetView = Marionette.CompositeView.extend({
             this.regenModel();
             this.render();
             
+            //tooltippy stuff
+            //NOTE: MAKE THESE LESS UGLY HOLY CRAP
             var att = this.model.attributes;
             $(".statspan").tooltip({content:function(){
                 var dbstat = att.module.stats[this.id];
@@ -332,35 +401,45 @@ App.CharsheetView = Marionette.CompositeView.extend({
                 if (dbstat && "formula" in dbstat) {
                     r += "Formula: "+dbstat.formula+"<br>\n";
                     //maybe include the actual values later
+                } else if (dbstat.type == "str") {
+                    r += "Click to edit string value";
                 } else if (dbstat.type == "int") {
-                    r += "Base: "+att.basestat[this.id].base+"<br>\n";
+                    r += "Base: "+att.basestat[this.id].base+"<br>";
                     for (var modname in att.modstat) {
                         var mod = att.modstat[modname];
                         if (this.id in mod) {
-                            r += modname+": "+mod[this.id]+"<br>\n";
+                            r += modname+": "+mod[this.id]+"<br>";
                         }
                     } 
-                    r += "<br>Final: "+att.finalstat[this.id]+"<br>\n";
+                    r += "<br>Final: "+att.finalstat[this.id]+"<br>";
+                    r += "<br>Click to edit base value";
                 } else if (dbstat.type == "choice") {
-                    chc = dbstat.choice[att.basestat[this.id].base];
+                    var chc = {};
+                    for (var i=0; i<dbstat.choice.length; i++) {
+                        var c = dbstat.choice[i];
+                        if(c.name==att.basestat[this.id].base) {
+                            chc = c; break;
+                        }
+                    }
                     if("modifier" in chc) {
-                        r += "Modifiers: <br>\n"
+                        r += "Modifiers: <br>"
                         r += "<ul>\n"
                         var mod = chc.modifier;
                         for (var eff in mod) {
-                            r += "<li>"+eff+": "+mod[eff]+"</li>\n";
+                            r += "<li>"+eff+": "+mod[eff]+"</li>";
                         }
-                        r += "</ul>\n"
+                        r += "</ul>"
                     }
                     if("unlock" in chc) {
-                        r += "Unlocks: <br>\n"
-                        r += "<ul>\n"
+                        r += "Unlocks: <br>"
+                        r += "<ul>"
                         var unl = chc.unlock;
                         for (var i in unl) {
-                            r += "<li>"+unl[i]+"</li>\n";
+                            r += "<li>"+unl[i]+"</li>";
                         }
-                        r += "</ul>\n"   
+                        r += "</ul>"   
                     }
+                    r += "<br>Click to modify choice";
                 }
                 return r;
             }});
@@ -376,7 +455,8 @@ var Chats = Backbone.Collection.extend({
 
 var Stat = Backbone.Model.extend();
 var Stats = Backbone.Collection.extend({
-    model:Stat
+    model:Stat,
+    comparator:function(){return this.get("line");}
 });
 var Charsheet = Backbone.Model.extend({});
 
