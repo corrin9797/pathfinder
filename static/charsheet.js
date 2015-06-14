@@ -303,6 +303,9 @@ App.CharsheetView = Marionette.CompositeView.extend({
 
         //populate charstat with sheet values
         for (var statname in sheet) {
+            if (!(charstat[statname])) {continue;}
+            if (charstat[statname].lock) {continue;}
+            
             var val = sheet[statname]
             if (!(statname in charstat)) {
                 charstat[statname] = {"type":"?"};
@@ -316,6 +319,7 @@ App.CharsheetView = Marionette.CompositeView.extend({
                     var c = choices[i];
                     if(c.name==val) {dbstat = c; break;}
                 }
+                
                 //unlock appropriate stats
                 if ("unlock" in dbstat) {
                     for (var ustat in dbstat.unlock) {
@@ -362,7 +366,7 @@ App.CharsheetView = Marionette.CompositeView.extend({
         var layout = module.layout;
         for (var i=0; i<layout.length; i++) {
             statname = layout[i];
-            if(statname in module.stats) {
+            if(statname in module.stats && !charstat[statname].lock) {
                 choices = module.stats[statname].choice
                 news = new Stat({
                     line:     i,
