@@ -96,13 +96,13 @@ App.NameView = Marionette.ItemView.extend({
     template: "#name-template",
     tagName: "div",
     events: {
-	"click #namesetbutton": function(){
+	    "click #namesetbutton": function(){
             var newname = $("#nametext").val();
             if (newname != "") {
                 this.model.set({name:newname});
             }
         },
-	"keydown #nametext": function(e){
+	    "keydown #nametext": function(e){
             if (e.keyCode==13) {
                 var newname = $("#nametext").val();
                 if (newname != "") {
@@ -231,7 +231,7 @@ App.CharsheetView = Marionette.CompositeView.extend({
         var att = this.model.attributes;
         var charstat = {} //character base stats
         var charmod = {}  //character stat modifiers
-        
+
         //init charstat from module
         for (var statname in att.module.stats) {
             var stat = att.module.stats[statname];
@@ -308,9 +308,12 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
         //regenerate collection
         this.collection.reset();
-        for (var statname in charfinal) {
+        var layout = att.module.layout;
+        for (var i=0; i<layout.length; i++) {
+            statname = layout[i];
             if(statname in att.module.stats) {
-                news = new Stat({name:statname, 
+                news = new Stat({line:i,
+                                 name:statname, 
                                  value:charfinal[statname]});
                 this.collection.add(news);
             }
@@ -376,7 +379,8 @@ var Chats = Backbone.Collection.extend({
 
 var Stat = Backbone.Model.extend();
 var Stats = Backbone.Collection.extend({
-    model:Stat
+    model:Stat,
+    comparator:function(){return this.get("line");}
 });
 var Charsheet = Backbone.Model.extend({});
 

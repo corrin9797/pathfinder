@@ -41,8 +41,9 @@
 
     },
 
-
-    "layout": "STR: {STR}<br>DEX: {DEX}<br>CON: {CON}<br>INT: {INT}<br>WIS: {WIS}<br>CHA: {CHA}<br><br>Race: {Race}<br>Human Racial Bonus: {Human Racial Bonus}<br><br>Melee To-Hit: {Melee To-Hit}<br>"
+    "layout": ["User","Name",
+               "Race","Human Racial Bonus",
+               "STR","DEX","CON","INT","WIS","CHA"]
 }
     
     
