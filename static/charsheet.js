@@ -198,8 +198,6 @@ App.StatView = Marionette.ItemView.extend({
     }
 });
 
-
-//NOTE: UNBREAK LAYOUTS
 App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
     childView: App.StatView,
@@ -328,6 +326,8 @@ App.CharsheetView = Marionette.CompositeView.extend({
             this.regenModel();
             this.render();
             
+            //tooltippy stuff
+            //NOTE: MAKE THESE LESS UGLY HOLY CRAP
             var att = this.model.attributes;
             $(".statspan").tooltip({content:function(){
                 var dbstat = att.module.stats[this.id];
@@ -335,35 +335,39 @@ App.CharsheetView = Marionette.CompositeView.extend({
                 if (dbstat && "formula" in dbstat) {
                     r += "Formula: "+dbstat.formula+"<br>\n";
                     //maybe include the actual values later
+                } else if (dbstat.type == "str") {
+                    r += "Click to edit string value";
                 } else if (dbstat.type == "int") {
-                    r += "Base: "+att.basestat[this.id].base+"<br>\n";
+                    r += "Base: "+att.basestat[this.id].base+"<br>";
                     for (var modname in att.modstat) {
                         var mod = att.modstat[modname];
                         if (this.id in mod) {
-                            r += modname+": "+mod[this.id]+"<br>\n";
+                            r += modname+": "+mod[this.id]+"<br>";
                         }
                     } 
-                    r += "<br>Final: "+att.finalstat[this.id]+"<br>\n";
+                    r += "<br>Final: "+att.finalstat[this.id]+"<br>";
+                    r += "<br>Click to edit base value";
                 } else if (dbstat.type == "choice") {
                     chc = dbstat.choice[att.basestat[this.id].base];
                     if("modifier" in chc) {
-                        r += "Modifiers: <br>\n"
+                        r += "Modifiers: <br>"
                         r += "<ul>\n"
                         var mod = chc.modifier;
                         for (var eff in mod) {
-                            r += "<li>"+eff+": "+mod[eff]+"</li>\n";
+                            r += "<li>"+eff+": "+mod[eff]+"</li>";
                         }
-                        r += "</ul>\n"
+                        r += "</ul>"
                     }
                     if("unlock" in chc) {
-                        r += "Unlocks: <br>\n"
-                        r += "<ul>\n"
+                        r += "Unlocks: <br>"
+                        r += "<ul>"
                         var unl = chc.unlock;
                         for (var i in unl) {
-                            r += "<li>"+unl[i]+"</li>\n";
+                            r += "<li>"+unl[i]+"</li>";
                         }
-                        r += "</ul>\n"   
+                        r += "</ul>"   
                     }
+                    r += "<br>Click to modify choice";
                 }
                 return r;
             }});

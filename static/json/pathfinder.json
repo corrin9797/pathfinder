@@ -43,7 +43,8 @@
 
     "layout": ["User","Name",
                "Race","Human Racial Bonus",
-               "STR","DEX","CON","INT","WIS","CHA"]
+               "STR","DEX","CON","INT","WIS","CHA",
+               "Melee To-Hit"]
 }
     
     
