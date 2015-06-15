@@ -103,34 +103,29 @@ def about():
         return render_template ("page1.html",
                                  corner = None)
 
-@app.route('/love')
-def love():
+@app.route('/my_sheets')
+def my_sheets():
     if 'username' in session:
+        l = ""
+        ids = base.getIDs(session['username'])
+        for n in ids:
+            l += "<a href = \"/charsheet/" + str (n) + "\" >" + getName(n) + "</a><br>"
+            print n
         return render_template  ("page2.html",
-                                 corner = escape(session['username']))
+                                 corner = escape(session['username']), 
+                                 IDS = l)
     else:
         return render_template ("error.html")
 
-@app.route('/death')
-def death():
+@app.route('/create')
+def create():
     if 'username' in session:
-        return render_template  ("page3.html",
-                                 corner = escape(session['username']))
+        url = "/charsheet/" + str(create_sheet (session['username']))
+        #return charsheet_html(create_sheet (session['username']))
+        return redirect (url)
     else:
         return render_template ("error.html")
 
-@app.route('/illegal')
-def illegal():
-    if 'username' in session:
-        return render_template  ("page4.html",
-                                 corner = escape(session['username']))
-    else:
-        return render_template ("error.html")
-
-@app.route('/reset')
-def reset():
-    base.restart()
-    return redirect(url_for('index'))
 ######################
 
 
@@ -193,6 +188,8 @@ def ajax_charsheet(sheetid):
         sheetdb.save(sheet)
     return bson.json_util.dumps(sheet)
 
+
+####################
 #JESUS
 def initchatdb():
     testChan = chatdb.find_one({"title":"test"})
@@ -223,13 +220,45 @@ def initsheetdb():
         bobjson = json.load(bobjsonf)
         bobjsonf.close()
         sheetdb.insert(bobjson)
+        base.addID("testing", 0)
+
+def create_sheet(username):
+    n = base.getNextID()
+    bobjsonf = open("static/json/bob.json")
+    bobjson = json.load(bobjsonf)
+    bobjsonf.close()
+    bobjson["SHEET_ID"] = str(n)
+    printSheets()
+    sheetdb.insert(bobjson)
+    base.addID(username, n)
+    return n
+
+def printSheets():
+    print "List of Sheets\n"
+    cres = sheetdb.find()
+    for r in cres:
+        print r
+
+def getName(ID):
+    cres = sheetdb.find({"SHEET_ID":ID})
+    name  = [r for r in cres][0]["Name"]
+    return name
+        
+##########
 
 def initeverything():
     initchatdb()
     initmoddb()
     initsheetdb()
 
-initeverything()
+
+@app.route('/reset')
+def reset():
+    base.restart()
+    initeverything()
+    return redirect(url_for('index'))
+
+
 
 # set the secret key.  keep this really secret:
 #this is fake very fake oooh
@@ -237,4 +266,6 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 if __name__ == "__main__":
     app.debug = True
-    app.run(host = "104.236.54.62", port = 1247)
+    #app.run(host = "104.236.54.62", port = 1247)
+    app.run(host = "127.0.0.1", port = 1247)
+

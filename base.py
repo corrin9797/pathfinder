@@ -7,9 +7,21 @@ db = conn['1247']
 
 
 def restart():
+    db.idnum.drop()
+    n = {"next" : 1}
+    db.idnum.insert(n)
+    
     db.usertable.drop()
     tdic = {'username': 'testing', 'password':'testing', 'IDs':''}
-    db.usertable.insert(tdic)   
+    db.usertable.insert(tdic)
+
+def getNextID():
+    cres = db.idnum.find()
+    old  = [r for r in cres][0]["next"]
+    new = old + 1
+    db.idnum.update ({'next':old}, {"$set": {'next':new}})
+    
+    return old
 
 def printData():
     cres = db.usertable.find()

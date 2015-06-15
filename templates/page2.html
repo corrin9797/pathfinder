@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
+{% block head %}{% endblock %}
+
 {% block body %}
-<center>
-<img src="static/love.png" alt="kairos" class="img-rounded">
-</center>
+{{ IDS | safe }}
+<br>
+<a href = "/create" >create a new sheet</a>
 {% endblock %}
