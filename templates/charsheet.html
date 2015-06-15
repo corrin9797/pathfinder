@@ -2,13 +2,17 @@
 <html>
 
 <head>
-  <script src="static/js/jquery.js"></script>
-  <script src="static/js/lodash.js"></script>
-  <script src="static/js/backbone.js"></script>
-  <script src="static/js/backbone.marionette.js"></script>
+  <script>
+    var SHEET_ID = {{sheetid}};
+  </script>
 
-  <link rel="stylesheet" href="static/jqui/jquery-ui.min.css">
-  <script src="static/jqui/jquery-ui.min.js"></script>
+  <script src="/static/js/jquery.js"></script>
+  <script src="/static/js/lodash.js"></script>
+  <script src="/static/js/backbone.js"></script>
+  <script src="/static/js/backbone.marionette.js"></script>
+
+  <link rel="stylesheet" href="/static/jqui/jquery-ui.min.css">
+  <script src="/static/jqui/jquery-ui.min.js"></script>
   <!--link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"-->
   <!--<link rel="stylesheet" href="static/test/board.css">-->
 </head>
@@ -24,7 +28,13 @@
       <td>
         <div id="chat-reg"></div>
       </td>
-  </tr></table>
+    </tr>
+    <tr>
+      <td>
+	<div id="new-stat"></div>
+      </td>
+    </tr>
+  </table>
 
   <!-- script templates -->
   <script type="text/template" id="chat-template">
@@ -58,17 +68,28 @@
 
   <script type="text/template" id="charsheet-template">
     <div id="statdisplay">
-      <%= showStats() %>
+      <!--%= showStats() %-->
     </div>
   </script>
-
-  <!-- page scripts -->
-  <script src="static/evaluator.js"></script>
-  <script src="static/strformat.js"></script>
-  <script src="static/chat.js"></script>
-  <script src="static/charsheet.js"></script>
-  <!--
   
+  <script type="text/template" id="stat-template">
+    <%= name %>: <span class="statspan" id="<%= name %>" title=""> <%= finalval %></span>
+  </script>
+  
+  <script type="text/template" id="new-stat-template">
+    <div id="newstat">
+      <input type="text" id="name"></input>
+      <input type="text" id="formula"></input>
+      <input type="button" id="submit"></input>
+    </div>
+  </script>
+  
+  <!-- page scripts -->
+  <script src="/static/evaluator.js"></script>
+  <script src="/static/strformat.js"></script>
+  <script src="/static/chat.js"></script>
+  <script src="/static/charsheet.js"></script>
+  <!--
   -->
 </body>
 </html>

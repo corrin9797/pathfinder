@@ -1,27 +1,25 @@
-stat page test
-=======
-# pathfinder
+# Pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
-[project link]
+Link: <a href="http://stuypathfinder.mooo.com">http://stuypathfinder.mooo.com</a> (May not be running yet but it's set up)
 [project video???]
 
 Lawrence - Server + mongo/json/sorta js
 
 Jessica - (CSS? + )mongo + flask + droplet stuff
 
-Vanessa - js/html
+Vanessa - js/html (w/ Corrin)
 
-Corrin - js/html
+Corrin - js/html (w/ Vanessa)
 
 idek????
 
 Elements:
 ------
-* storing info (login, data, etc)
- * auto save?
-* auto fill/calculate views
-* random dice generator
+* Storing info (login, data, etc)
+ * Auto save?
+* Auto fill/calculate views
+* Random dice generator
 
 Timeline
 -----
@@ -33,10 +31,17 @@ Timeline
   *	Views that are tied to the existence of other views (1 week)
 * Random dice generator (1 day)
 
-5/12/15 - elements: login present. using chat as basis for storage. working on adapting it to database structure required for project. working on js meant to show on the page itself.
+5/12/15 - Elements: login present. Using chat as basis for storage. Working on adapting it to database structure required for project. Working on js meant to show on the page itself.
 
-5/20/15 - ip address working eey
-<a href = "http://freedns.afraid.org/subdomain/">note to self</a>
+5/20/15 - IP address working eey
+<a href = "http://freedns.afraid.org/subdomain/">note to self</a> Continuing stat page stuff
+
+5/21/15 - Got website working instead of studying for Ap's, I'm so good.
+
+5/22/15 - Set up dns (stuypathfinder.mooo.com) and more stat page stuff.
+
+5/23/15 - Char page setup.
+
 
 Database Structures
 

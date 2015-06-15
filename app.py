@@ -153,9 +153,10 @@ def test():
     print chatdb.find_one({"title":"test".replace("%20"," ")})
     return "hi"
 
-@app.route('/charsheet')
-def on_test():
-    return render_template("charsheet.html")
+@app.route('/charsheet/<sheetid>')
+def charsheet_html(sheetid):
+    return render_template("charsheet.html",
+                           sheetid=sheetid)
 
 @app.route("/ajax/chat/<channel>",methods=['GET','POST'])
 def ajax_chat(channel):
@@ -163,7 +164,7 @@ def ajax_chat(channel):
     if request.method == "POST":
         pdat = json.loads(request.data)
         newChat = {"author":pdat["author"],
-                    "content":pdat["content"]}
+                   "content":pdat["content"]}
         curChan["chat"].append(newChat)
         if len(curChan["chat"]) > 200:
             curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]
@@ -181,13 +182,15 @@ def ajax_module(name):
         pass #uh
     return bson.json_util.dumps(mod)
 
-@app.route("/ajax/charsheet/<username>/<charname>",
+#@app.route("/ajax/charsheet/<id>",
+@app.route("/ajax/charsheet/<sheetid>",
            methods=['GET','POST'])
-def ajax_charsheet(username,charname):
-    sheet = sheetdb.find_one({"User":username.replace("%20"," "),
-                              "Name":charname.replace("%20"," ")})
+def ajax_charsheet(sheetid):
+    sheet = sheetdb.find_one({"SHEET_ID":sheetid})
     if request.method == "POST":
-        pass #uh
+        dat = json.loads(request.data)
+        sheet[dat["statname"]] = dat["newvalue"]
+        sheetdb.save(sheet)
     return bson.json_util.dumps(sheet)
 
 #JESUS
