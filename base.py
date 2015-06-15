@@ -8,7 +8,7 @@ db = conn['1247']
 
 def restart():
     db.idnum.drop()
-    n = {"next" : 1}
+    n = {"next" : 2}
     db.idnum.insert(n)
     
     db.usertable.drop()

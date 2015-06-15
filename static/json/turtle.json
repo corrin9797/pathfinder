@@ -1,0 +1,76 @@
+{
+    "title":"Something to Do with Turtles",
+    "author":"James Lu",
+    "stats": {
+        "Name": {"type":"str"},
+        
+        "HP": {"type":"int"},
+
+        "Stubbornness": {"type":"int"},
+        "Wisdom": {"type":"int"},
+        "Slipperiness": {"type":"int"},
+
+        "Class": { 
+            "type": "choice",
+            "choice": [
+                {"name":"Tea Party Member", 
+                 "modifier": {"Stubbornness":5, "Wisdom":-2},
+                 "unlock": ["Politics Skill"]},
+                {"name":"Mathematician", 
+                 "modifier": {"Wisdom":5, "Slipperiness":-2},
+                 "unlock": ["Mathemagic Skill"] },
+                {"name":"Attorney", 
+                 "modifier": {"Slipperiness":5, "Stubbornness":-2},
+                 "unlock": ["Legalese Skill"] }
+            ]
+        },
+        
+        "Politics Skill": {
+            "type": "choice",
+            "locked": true,
+            "choice": [
+                {"name":"SWING!"},
+                {"name":"Debate"},
+                {"name":"Shut Down the Government"},
+                {"name":"Filibuster"},
+                {"name":"Suit and Tie"},
+                {"name":"Garotte"},
+                {"name":"Increase Defense Budget"}
+            ]
+        },
+
+        "Mathemagic Skill": {
+            "type": "choice",
+            "locked": true,
+            "choice": [
+                {"name":"Arithmetic"},
+                {"name":"Solve for X"},
+                {"name":"Quadratic Formula"},
+                {"name":"Increase Defense Budget"},
+                {"name":"Form of... Actuary!"},
+                {"name":"Filibuster"},
+                {"name":"Mind of Accountant"}
+            ]
+        },
+
+        "Legalese Skill": {
+            "type": "choice",
+            "locked": true,
+            "choice": [
+                {"name":"Swagger"},
+                {"name":"Fix Tie"},
+                {"name":"**Bow Tie**"},
+                {"name":"Garotte"},
+                {"name":"Mind of Accountant"},
+                {"name":"Suit and Tie"},
+                {"name":"Form of... Actuary!"}
+            ]
+        }
+    },
+
+    "layout": ["Name","Class",
+               "HP",
+               "Stubbornness","Wisdom","Slipperiness",
+               "Politics Skill","Mathemagic Skill","Legalese Skill"]
+}
+    

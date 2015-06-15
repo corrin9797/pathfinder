@@ -1,0 +1,17 @@
+{
+    "SHEET_ID":"1",
+    "User":"Jamal",
+    "Module":"Something to Do with Turtles",
+    
+    "Name":"The Red",
+    
+    "Class":"Tea Party Member",
+    "Politics Skill":"SWING!",
+    "Mathemagic Skill":"Arithmetic",
+    "Legalese Skill":"Swagger",
+
+    "HP":20,
+    "Stubbornness":10,
+    "Wisdom":10,
+    "Slipperiness":10
+}

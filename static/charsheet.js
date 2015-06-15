@@ -4,6 +4,12 @@
 function ajaxupdatestat() {
     $.getJSON("/ajax/charsheet/"+SHEET_ID,function(sheetjson){
         charsheet.set({"sheet":sheetjson});
+        var mod = charsheet.get("sheet").Module;
+        if (charsheet.get("module").layout.length == 0) {
+            $.getJSON("/ajax/module/"+mod, function(modjson){
+                charsheet.set({"module":modjson});
+            })
+        }
     });
 }
 
@@ -226,42 +232,51 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
 
         //populate charstat with sheet values
-        for (var statname in sheet) {
-            if (!(charstat[statname])) {continue;}
-            if (charstat[statname].lock) {continue;}
-            
-            var val = sheet[statname]
-            if (!(statname in charstat)) {
-                charstat[statname] = {"type":"?"};
-            }
-            charstat[statname].base = val;
-            
-            if (charstat[statname].type=="choice") {
-                var choices = module.stats[statname].choice
-                var dbstat = {};
-                for (var i=0; i<choices.length; i++) {
-                    var c = choices[i];
-                    if(c.name==val) {dbstat = c; break;}
-                }
+        var didUnlock = true;
+        var checkedStats = [];
+        while(didUnlock) {
+            didUnlock = false;
+            for (var statname in sheet) {
+                if (checkedStats.indexOf(statname) > -1) {continue;}
+                if (!(charstat[statname])) {continue;}
+                if (charstat[statname].lock) {continue;}
+                checkedStats.push(statname);
                 
-                //unlock appropriate stats
-                if ("unlock" in dbstat) {
-                    for (var ustat in dbstat.unlock) {
-                        ustat = dbstat.unlock[ustat]; //mfwjs
-                        charstat[ustat].lock = false;
-                    }
+                var val = sheet[statname]
+                if (!(statname in charstat)) {
+                    charstat[statname] = {"type":"?"};
                 }
+                charstat[statname].base = val;
                 
-                //add modifiers to list
-                if ("modifier" in dbstat) {
-                    var newmod = {};
-                    for (var effname in dbstat.modifier) {
-                        var val = dbstat.modifier[effname];
-                        newmod[effname] = val;
+                if (charstat[statname].type=="choice") {
+                    var choices = module.stats[statname].choice
+                    var dbstat = {};
+                    for (var i=0; i<choices.length; i++) {
+                        var c = choices[i];
+                        if(c.name==val) {dbstat = c; break;}
                     }
-                    charmod[statname] = newmod;
+                    
+                    //unlock appropriate stats
+                    if ("unlock" in dbstat) {
+                        didUnlock = true;
+                        for (var ustat in dbstat.unlock) {
+                            ustat = dbstat.unlock[ustat]; //mfwjs
+                            charstat[ustat].lock = false;
+                        }
+                    }
+                    
+                    //add modifiers to list
+                    if ("modifier" in dbstat) {
+                        var newmod = {};
+                        for (var effname in dbstat.modifier) {
+                            var val = dbstat.modifier[effname];
+                            newmod[effname] = val;
+                        }
+                        charmod[statname] = newmod;
+                    }   
+                            
                 }   
-            }   
+            }
         }
         
         //generate final stats
@@ -380,8 +395,6 @@ var Stats = Backbone.Collection.extend({
 });
 var Charsheet = Backbone.Model.extend({});
 
-var user = new User({name:"Anonymous"});
-
 var stats = new Stats();
 var charsheet = new Charsheet({
     module:{layout:[]}, 
@@ -391,9 +404,6 @@ var charsheet = new Charsheet({
     finalstat:{}
 });
 
-$.getJSON("/ajax/module/Pathfinder",function(modjson){
-    charsheet.set({"module":modjson});
-})
 ajaxupdatestat();
 
 App.start();
