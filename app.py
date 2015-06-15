@@ -14,27 +14,6 @@ stat = conn['stat']
 def index():
     return "yolo"
 
-@app.route ("/input_reset")
-def input_reset():
-    stat.stattable.drop()
-    i = {"user":"hello", "stats":[1,2,3,4]}
-    stat.stattable.insert(i)
-    return redirect (url_for ("input"))
-
-@app.route("/input", methods=['GET', 'POST'])
-def input():
-    if request.method == 'POST':
-        i = {"user": request.form ["name"], "stats":request.form [
-        "stat"]}
-        stat.stattable.insert(i)
-    cres = stat.stattable.find()
-    for r in cres:
-        print r
-    return """<form method = "POST"><input type = "text" name = name id="input"></input><input type = "text" name = stat id="input"></input><input type = "submit"></input></form>"""
-
-################################################################
-#mongoclient
-
 client = MongoClient()
 db = client['pathfinder']
 chatdb = db['chat']
