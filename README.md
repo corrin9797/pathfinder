@@ -1,8 +1,9 @@
 # Pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
+New Link: <a href = "http://yolorpg.chickenkiller.com/">http://yolorpg.chickenkiller.com/</a>
 Link: <a >http://stuypathfinder.mooo.com</a> (May not be running yet but it's set up)
-never mind someone broke it
+(never mind someone broke it)
 <p>
 [project video???]
 
