@@ -2,7 +2,7 @@ from flask import Flask, session, redirect, url_for, escape, request, render_tem
 from functools import wraps
 from pymongo import MongoClient, Connection
 import bson.json_util
-#import base
+import base
 
 
 app = Flask(__name__)
@@ -10,30 +10,129 @@ app = Flask(__name__)
 conn = Connection()
 stat = conn['stat']
 
-@app.route ("/")
+#ACCOUNT SHIT
+################
+def validate(func):
+    @wraps(func)
+    def inner (*args, **kwargs):
+        error = None
+        if request.method == 'POST':
+            if base.validate (request.form['username'], request.form['password']):
+                session['username'] = request.form['username']
+                flash('You were successfully logged in')
+                return redirect(url_for('index'))
+            else:
+                error = "Invalid credentials"
+                return render_template ("login.html", error = error)
+        return func()
+    return inner
+
+@app.route('/')
 def index():
-    return "yolo"
+    if 'username' in session:
+        return render_template ("index.html", 
+                                corner = escape(session['username']))
+    else:
+        return render_template ("index2.html")
 
-@app.route ("/input_reset")
-def input_reset():
-    stat.stattable.drop()
-    i = {"user":"hello", "stats":[1,2,3,4]}
-    stat.stattable.insert(i)
-    return redirect (url_for ("input"))
+@app.route('/login', methods=['GET', 'POST'])
+#@base.validate(request.form['username'], request.form['password'])
+#def login():
+#    error = None
+#    if request.method == 'POST':
+#        session['username'] = request.form['username']
+#        flash('You were successfully logged in')
+#        return redirect(url_for('index'))
+#    else:
+#        return render_template ("login.html", error = error)
+@validate
+def login():
+    #else:
+    return render_template ("login.html")
 
-@app.route("/input", methods=['GET', 'POST'])
-def input():
-    if request.method == 'POST':
-        i = {"user": request.form ["name"], "stats":request.form [
-        "stat"]}
-        stat.stattable.insert(i)
-    cres = stat.stattable.find()
-    for r in cres:
-        print r
-    return """<form method = "POST"><input type = "text" name = name id="input"></input><input type = "text" name = stat id="input"></input><input type = "submit"></input></form>"""
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    flash("You have logged out")
+    return redirect(url_for('index'))
 
-################################################################
-#mongoclient
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    if 'username' in session:
+        flash("You are already logged in")
+        return redirect(url_for('index'))
+    elif request.method == 'POST':
+        if base.addUser (request.form['username'], request.form['password']):
+            session['username'] = request.form['username']
+            flash ("You have successfully registered")
+            return redirect(url_for('index'))
+        else:
+            error = "That username is already taken"
+            return  render_template ("register.html", error = error)
+    else:
+        return  render_template ("register.html", error = error)
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    error = None
+    if 'username' in session:
+        if request.method == 'POST':
+            if base.updateUser (escape(session['username']), request.form['password'], request.form ['newpassword']):
+                flash ("You have successfully changed your settings")
+                return redirect(url_for('index'))
+            else:
+                error = "You have entered the wrong password"
+                return render_template ("settings.html", 
+                                        corner = escape(session['username']), 
+                                        error = error)
+        else:
+            return render_template ("settings.html", 
+                                        corner = escape(session['username']), 
+                                        error = error)
+    else:
+        return render_template ("error.html")
+
+@app.route('/about')
+def about():
+    if 'username' in session:
+        return render_template  ("page1.html",
+                                 corner = escape(session['username']))
+    else:
+        return render_template ("page1.html",
+                                 corner = None)
+
+@app.route('/love')
+def love():
+    if 'username' in session:
+        return render_template  ("page2.html",
+                                 corner = escape(session['username']))
+    else:
+        return render_template ("error.html")
+
+@app.route('/death')
+def death():
+    if 'username' in session:
+        return render_template  ("page3.html",
+                                 corner = escape(session['username']))
+    else:
+        return render_template ("error.html")
+
+@app.route('/illegal')
+def illegal():
+    if 'username' in session:
+        return render_template  ("page4.html",
+                                 corner = escape(session['username']))
+    else:
+        return render_template ("error.html")
+
+@app.route('/reset')
+def reset():
+    base.restart()
+    return redirect(url_for('index'))
+######################
+
 
 client = MongoClient()
 db = client['pathfinder']
@@ -135,4 +234,4 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 if __name__ == "__main__":
     app.debug = True
-    app.run(host = "127.0.0.1", port = 1247)
+    app.run(host = "104.236.54.62", port = 1247)
