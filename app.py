@@ -215,7 +215,9 @@ def create_sheet(username,module):
     bobjson = json.load(bobjsonf)
     bobjsonf.close()
     bobjson["SHEET_ID"] = str(n)
-    printSheets()
+    bobjson["User"] = session['username']
+    #printSheets()
+    print bobjson
     sheetdb.insert(bobjson)
     base.addID(username, n)
     return n

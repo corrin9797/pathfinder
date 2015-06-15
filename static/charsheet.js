@@ -4,6 +4,7 @@
 function ajaxupdatestat() {
     $.getJSON("/ajax/charsheet/"+SHEET_ID,function(sheetjson){
         charsheet.set({"sheet":sheetjson});
+        owner.set({"name":charsheet.get("sheet").User});
         var mod = charsheet.get("sheet").Module;
         if (charsheet.get("module").layout.length == 0) {
             $.getJSON("/ajax/module/"+mod, function(modjson){
@@ -34,7 +35,6 @@ var App = new Marionette.Application();
 
 App.addRegions({
     headReg: "#head-reg",
-    nameReg: "#name-reg",
     charsheetReg: "#charsheet-reg",
     //#############
     newStatReg: "#new-stat"
@@ -42,6 +42,8 @@ App.addRegions({
 });
 
 App.on("start",function(){
+    var headView = new App.HeadView({model:owner});
+    App.headReg.show(headView);
     var charsheetView = new App.CharsheetView({model:charsheet, 
                                                collection:stats});
     App.charsheetReg.show(charsheetView);
@@ -185,7 +187,7 @@ App.StatView = Marionette.ItemView.extend({
 App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
     childView: App.StatView,
-    childViewContainer: "div",
+    childViewContainer: "div#statdisplay",
     initialize: function() {
     },
     triggers: {
@@ -386,7 +388,14 @@ App.CharsheetView = Marionette.CompositeView.extend({
     }
 });
 
-var User = Backbone.Model.extend();
+App.HeadView = Marionette.ItemView.extend({
+    template: "#head-template",
+    modelEvents: {
+        "change":"render"
+    }
+});
+
+var Owner = Backbone.Model.extend();
 
 var Stat = Backbone.Model.extend();
 var Stats = Backbone.Collection.extend({
@@ -394,6 +403,10 @@ var Stats = Backbone.Collection.extend({
     comparator:function(){return this.get("line");}
 });
 var Charsheet = Backbone.Model.extend({});
+
+var owner = new Owner({
+    name:"[???]"
+});
 
 var stats = new Stats();
 var charsheet = new Charsheet({

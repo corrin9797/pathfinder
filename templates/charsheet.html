@@ -16,19 +16,22 @@
 {% block body %}
 
 <!-- page content -->
-<div id="charsheet-reg"></div>
-<div id="new-stat"></div>
+<div id="head-reg"></div><br>
+<div id="charsheet-reg"></div><br>
+<div id="new-stat"></div><br>
 
 
 <!-- script templates -->
 <script type="text/template" id="charsheet-template">
-  <div id="statdisplay">
-    <!--%= showStats() %-->
-  </div>
+  <div id="statdisplay"></div>
 </script>
 
 <script type="text/template" id="stat-template">
   <%= name %>: <span class="statspan" id="<%= name %>" title=""> <%= finalval %></span>
+</script>
+
+<script type="text/template" id="head-template">
+  This sheet belongs to <%= name %>.
 </script>
 
 <script type="text/template" id="new-stat-template">
