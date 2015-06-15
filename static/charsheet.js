@@ -4,6 +4,13 @@
 function ajaxupdatestat() {
     $.getJSON("/ajax/charsheet/"+SHEET_ID,function(sheetjson){
         charsheet.set({"sheet":sheetjson});
+        owner.set({"name":charsheet.get("sheet").User});
+        var mod = charsheet.get("sheet").Module;
+        if (charsheet.get("module").layout.length == 0) {
+            $.getJSON("/ajax/module/"+mod, function(modjson){
+                charsheet.set({"module":modjson});
+            })
+        }
     });
 }
 
@@ -28,8 +35,6 @@ var App = new Marionette.Application();
 
 App.addRegions({
     headReg: "#head-reg",
-    nameReg: "#name-reg",
-    chatReg: "#chat-reg",
     charsheetReg: "#charsheet-reg",
     //#############
     newStatReg: "#new-stat"
@@ -37,15 +42,8 @@ App.addRegions({
 });
 
 App.on("start",function(){
-    var headView = new App.HeadView();
+    var headView = new App.HeadView({model:owner});
     App.headReg.show(headView);
-    
-    var nameView = new App.NameView({model:user});
-    App.nameReg.show(nameView);
-    
-    var chatView = new App.ChatView({collection:chats});
-    App.chatReg.show(chatView);
-    
     var charsheetView = new App.CharsheetView({model:charsheet, 
                                                collection:stats});
     App.charsheetReg.show(charsheetView);
@@ -55,11 +53,6 @@ App.on("start",function(){
     //#############
 
     Backbone.history.start();
-    ajaxupdatechat();
-});
-
-App.HeadView = Marionette.ItemView.extend({
-    template: "#head-template"
 });
 
 App.NewStatView = Marionette.ItemView.extend({
@@ -90,67 +83,6 @@ App.NewStatView = Marionette.ItemView.extend({
         }
     }
 })	
-
-
-App.NameView = Marionette.ItemView.extend({
-    template: "#name-template",
-    tagName: "div",
-    events: {
-	    "click #namesetbutton": function(){
-            var newname = $("#nametext").val();
-            if (newname != "") {
-                this.model.set({name:newname});
-            }
-        },
-	    "keydown #nametext": function(e){
-            if (e.keyCode==13) {
-                var newname = $("#nametext").val();
-                if (newname != "") {
-                    this.model.set({name:newname});
-                    this.$("#nametext").focus();
-                }
-            }
-        }
-    },
-    modelEvents: {
-	"change":function(){
-	    this.render();
-	}
-    }
-});
-
-App.ChatView = Marionette.CompositeView.extend({
-    template: "#chat-template",
-    childView: App.MessageView,
-    childViewContainer: "span",
-    events: {
-        "click #chatsendbutton": function() {
-            var newchat = $("#chattext").val();
-            if (newchat != "") {
-                ajaxsendchat(newchat);
-                ajaxupdatechat();
-                this.$("#chattext").focus();
-            }
-            $("#chattext").val("");
-        },
-	    "keydown #chattext": function(e){
-            if (e.keyCode==13) {
-                var newchat = $("#chattext").val();
-                if (newchat != "") {
-                    ajaxsendchat(newchat);
-                    ajaxupdatechat();
-                    this.$("#chattext").focus();
-                }
-                $("#chattext").val("");
-            }
-        }
-    },
-    modelEvents: {
-        "change": function() {
-            this.render();
-        }
-    }
-});
 
 App.StatView = Marionette.ItemView.extend({
     template: "#stat-template",
@@ -255,7 +187,7 @@ App.StatView = Marionette.ItemView.extend({
 App.CharsheetView = Marionette.CompositeView.extend({
     template: "#charsheet-template",
     childView: App.StatView,
-    childViewContainer: "div",
+    childViewContainer: "div#statdisplay",
     initialize: function() {
     },
     triggers: {
@@ -302,42 +234,51 @@ App.CharsheetView = Marionette.CompositeView.extend({
         }
 
         //populate charstat with sheet values
-        for (var statname in sheet) {
-            if (!(charstat[statname])) {continue;}
-            if (charstat[statname].lock) {continue;}
-            
-            var val = sheet[statname]
-            if (!(statname in charstat)) {
-                charstat[statname] = {"type":"?"};
-            }
-            charstat[statname].base = val;
-            
-            if (charstat[statname].type=="choice") {
-                var choices = module.stats[statname].choice
-                var dbstat = {};
-                for (var i=0; i<choices.length; i++) {
-                    var c = choices[i];
-                    if(c.name==val) {dbstat = c; break;}
-                }
+        var didUnlock = true;
+        var checkedStats = [];
+        while(didUnlock) {
+            didUnlock = false;
+            for (var statname in sheet) {
+                if (checkedStats.indexOf(statname) > -1) {continue;}
+                if (!(charstat[statname])) {continue;}
+                if (charstat[statname].lock) {continue;}
+                checkedStats.push(statname);
                 
-                //unlock appropriate stats
-                if ("unlock" in dbstat) {
-                    for (var ustat in dbstat.unlock) {
-                        ustat = dbstat.unlock[ustat]; //mfwjs
-                        charstat[ustat].lock = false;
-                    }
+                var val = sheet[statname]
+                if (!(statname in charstat)) {
+                    charstat[statname] = {"type":"?"};
                 }
+                charstat[statname].base = val;
                 
-                //add modifiers to list
-                if ("modifier" in dbstat) {
-                    var newmod = {};
-                    for (var effname in dbstat.modifier) {
-                        var val = dbstat.modifier[effname];
-                        newmod[effname] = val;
+                if (charstat[statname].type=="choice") {
+                    var choices = module.stats[statname].choice
+                    var dbstat = {};
+                    for (var i=0; i<choices.length; i++) {
+                        var c = choices[i];
+                        if(c.name==val) {dbstat = c; break;}
                     }
-                    charmod[statname] = newmod;
+                    
+                    //unlock appropriate stats
+                    if ("unlock" in dbstat) {
+                        didUnlock = true;
+                        for (var ustat in dbstat.unlock) {
+                            ustat = dbstat.unlock[ustat]; //mfwjs
+                            charstat[ustat].lock = false;
+                        }
+                    }
+                    
+                    //add modifiers to list
+                    if ("modifier" in dbstat) {
+                        var newmod = {};
+                        for (var effname in dbstat.modifier) {
+                            var val = dbstat.modifier[effname];
+                            newmod[effname] = val;
+                        }
+                        charmod[statname] = newmod;
+                    }   
+                            
                 }   
-            }   
+            }
         }
         
         //generate final stats
@@ -447,11 +388,14 @@ App.CharsheetView = Marionette.CompositeView.extend({
     }
 });
 
-var User = Backbone.Model.extend();
-var Message = Backbone.Model.extend();
-var Chats = Backbone.Collection.extend({
-    model:Message
+App.HeadView = Marionette.ItemView.extend({
+    template: "#head-template",
+    modelEvents: {
+        "change":"render"
+    }
 });
+
+var Owner = Backbone.Model.extend();
 
 var Stat = Backbone.Model.extend();
 var Stats = Backbone.Collection.extend({
@@ -460,21 +404,19 @@ var Stats = Backbone.Collection.extend({
 });
 var Charsheet = Backbone.Model.extend({});
 
-var user = new User({name:"Anonymous"});
-var chats = new Chats();
+var owner = new Owner({
+    name:"[???]"
+});
 
 var stats = new Stats();
 var charsheet = new Charsheet({
-    module:{layout:""}, 
+    module:{layout:[]}, 
     sheet:{},
     basestat:{},
     modstat:{},
     finalstat:{}
 });
 
-$.getJSON("/ajax/module/Pathfinder",function(modjson){
-    charsheet.set({"module":modjson});
-})
 ajaxupdatestat();
 
 App.start();

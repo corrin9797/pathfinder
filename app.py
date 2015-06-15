@@ -119,10 +119,11 @@ def my_sheets():
     else:
         return render_template ("error.html")
 
-@app.route('/create')
-def create():
+@app.route('/create/<module>')
+def create(module):
     if 'username' in session:
-        url = "/charsheet/" + str(create_sheet (session['username']))
+        url = "/charsheet/" + \
+              str(create_sheet(session['username'],module))
         #return charsheet_html(create_sheet (session['username']))
         return redirect (url)
     else:
@@ -156,23 +157,6 @@ def charsheet_html(sheetid):
                            corner = escape(session['username']), 
                            sheetid=sheetid)
 
-@app.route("/ajax/chat/<channel>",methods=['GET','POST'])
-def ajax_chat(channel):
-    curChan = chatdb.find_one({"title":channel.replace("%20"," ")})
-    if request.method == "POST":
-        pdat = json.loads(request.data)
-        newChat = {"author":pdat["author"],
-                   "content":pdat["content"]}
-        curChan["chat"].append(newChat)
-        if len(curChan["chat"]) > 200:
-            curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]
-        chatdb.save(curChan)
-    r = ""
-    for msg in curChan["chat"]:
-
-        r+="&lt;%s&gt; %s<br>\n" % (msg["author"],msg["content"])
-    return jsonify(content=r)
-
 @app.route("/ajax/module/<name>",methods=['GET','POST'])
 def ajax_module(name):
     mod = moddb.find_one({"title":name.replace("%20"," ")})
@@ -180,7 +164,6 @@ def ajax_module(name):
         pass #uh
     return bson.json_util.dumps(mod)
 
-#@app.route("/ajax/charsheet/<id>",
 @app.route("/ajax/charsheet/<sheetid>",
            methods=['GET','POST'])
 def ajax_charsheet(sheetid):
@@ -194,44 +177,48 @@ def ajax_charsheet(sheetid):
 
 ####################
 #JESUS
-def initchatdb():
-    testChan = chatdb.find_one({"title":"test"})
-    if not testChan:
-        testChan = {"title":"test",
-                    "chat":[]}
-        chatdb.insert(testChan)
-
 #DEFINITELY NOT PRODUCTION CODE :^(
 def initmoddb():
-    pmod = moddb.find_one({"title":"Pathfinder"})
-    print moddb.find_one({})
-    #if not pmod:
-    if True: #testy
-        moddb.remove({}) #blood for the blood god
-        pjsonf = open("static/json/pathfinder.json")
-        pjson = json.load(pjsonf)
-        pjsonf.close()
-        moddb.insert(pjson)
+    moddb.remove({}) #blood for the blood god
+    pjsonf = open("static/json/yolo.json")
+    pjson = json.load(pjsonf)
+    pjsonf.close()
+    moddb.insert(pjson)
+    pjsonf = open("static/json/turtle.json")
+    pjson = json.load(pjsonf)
+    pjsonf.close()
+    moddb.insert(pjson)
 
 #ALSO DEFINITELY NOT PRODUCTION CODE :^((((
 def initsheetdb():
-    #bob = sheetdb.find_one({"Name":"Bob","User":"Jamal"})
-    #if not bob:
-    if True: #testy
-        sheetdb.remove({}) #blood for the blood god
-        bobjsonf = open("static/json/bob.json")
-        bobjson = json.load(bobjsonf)
-        bobjsonf.close()
-        sheetdb.insert(bobjson)
-        base.addID("testing", 0)
-
-def create_sheet(username):
-    n = base.getNextID()
+    sheetdb.remove({}) #blood for the blood god
     bobjsonf = open("static/json/bob.json")
     bobjson = json.load(bobjsonf)
     bobjsonf.close()
+    sheetdb.insert(bobjson)
+    bobjsonf = open("static/json/thered.json")
+    bobjson = json.load(bobjsonf)
+    bobjsonf.close()
+    sheetdb.insert(bobjson)
+    base.addID("testing", 0)
+
+def create_sheet(username,module):
+    n = base.getNextID()
+    modname = module.replace("%20"," ") 
+    if modname == "yoloRPG":        
+        jsonpath = "static/json/bob.json"
+    elif module.replace("%20"," ") == "Something to Do with Turtles":
+        jsonpath = "static/json/thered.json"
+    else:
+        jsonpath = "static/json/bob.json"
+        print "Unknown module? " +module
+    bobjsonf = open(jsonpath)
+    bobjson = json.load(bobjsonf)
+    bobjsonf.close()
     bobjson["SHEET_ID"] = str(n)
-    printSheets()
+    bobjson["User"] = session['username']
+    #printSheets()
+    print bobjson
     sheetdb.insert(bobjson)
     base.addID(username, n)
     return n
@@ -250,7 +237,6 @@ def getName(ID):
 ##########
 
 def initeverything():
-    initchatdb()
     initmoddb()
     initsheetdb()
 

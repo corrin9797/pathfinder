@@ -1,15 +1,17 @@
 {
     "SHEET_ID":"0",
     "User":"Jamal",
-    "Module":"Pathfinder Test",
+    "Module":"yoloRPG",
     
     "Name":"Bob",
+    
+    "Race":"Human",
+    "Racial Attribute Bonus":"CHA",
+    
     "STR":10,
     "DEX":11,
     "CON":12,
     "INT":13,
     "WIS":14,
-    "CHA":15,
-    "Race":"Human",
-    "Human Racial Bonus":"CHA"
+    "CHA":15
 }

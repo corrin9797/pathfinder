@@ -1,7 +1,9 @@
 # Pathfinder
 Vanessa, Lawrence, Corrin and Jessica's spring 2015 final project.
 ----
-Link: <a href="http://stuypathfinder.mooo.com">http://stuypathfinder.mooo.com</a> (May not be running yet but it's set up)
+Link: <a >http://stuypathfinder.mooo.com</a> (May not be running yet but it's set up)
+never mind someone broke it
+<p>
 [project video???]
 
 Lawrence - Server + mongo/json/sorta js

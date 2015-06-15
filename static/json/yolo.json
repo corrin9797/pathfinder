@@ -1,7 +1,8 @@
 {
-    "title":"Pathfinder",
+    "title":"yoloRPG",
     "author":"yourmom",
-    "stats": {"Name": {"type":"str"},
+    "stats": {
+        "Name": {"type":"str"},
         
         "STR": {"type":"int"},
         "DEX": {"type":"int"},
@@ -13,12 +14,24 @@
         "Race": { 
             "type": "choice",
             "choice": [
-                {"name":"Human", "unlock": ["Human Racial Bonus"]},
-                {"name":"Dwarf", "modifier": {"STR":2, "CON":2, "DEX":-2} }
+                {"name":"Dwarf", 
+                 "modifier": {"STR":2, "CON":2, "DEX":-2} },
+                {"name":"Elf", 
+                 "modifier": {"DEX":2, "INT":2, "CON":-2} },
+                {"name":"Gnome", 
+                 "modifier": {"CON":2, "CHA":2, "STR":-2} },
+                {"name":"Half Elf", 
+                 "unlock": ["Racial Attribute Bonus"]},
+                {"name":"Halfling", 
+                 "modifier": {"DEX":2, "CHA":2, "STR":-2} },
+                {"name":"Half Orc", 
+                 "unlock": ["Racial Attribute Bonus"]},
+                {"name":"Human", 
+                 "unlock": ["Racial Attribute Bonus"]}
             ]
         },
-
-        "Human Racial Bonus": {
+        
+        "Racial Attribute Bonus": {
             "type": "choice",
             "locked": true,
             "choice": [
@@ -39,7 +52,7 @@
     },
 
     "layout": ["Name",0,
-               "Race","Human Racial Bonus",
+               "Race","Racial Attribute Bonus",
                "STR","DEX","CON","INT","WIS","CHA",
                "Melee To-Hit"]
 }
