@@ -56,7 +56,7 @@ def addUser(usernamei, passwordi):
     print res
     if len(res)>0:
         return False
-    nu = {'username': usernamei, 'password':passwordi}
+    nu = {'username': usernamei, 'password':passwordi, 'IDs':''}
     db.usertable.save(nu)
     return True
 

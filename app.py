@@ -108,9 +108,11 @@ def my_sheets():
     if 'username' in session:
         l = ""
         ids = base.getIDs(session['username'])
-        for n in ids:
-            l += "<a href = \"/charsheet/" + str (n) + "\" >" + getName(n) + "</a><br>"
-            print n
+        print ids
+        if (ids != [""]):
+            for n in ids:
+                l += "<a href = \"/charsheet/" + str (n) + "\" >" + getName(n) + "</a><br>"
+                print n
         return render_template  ("page2.html",
                                  corner = escape(session['username']), 
                                  IDS = l)
