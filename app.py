@@ -153,6 +153,7 @@ def test():
 @app.route('/charsheet/<sheetid>')
 def charsheet_html(sheetid):
     return render_template("charsheet.html",
+                           corner = escape(session['username']), 
                            sheetid=sheetid)
 
 @app.route("/ajax/chat/<channel>",methods=['GET','POST'])
