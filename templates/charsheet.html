@@ -16,76 +16,32 @@
 {% block body %}
 
 <!-- page content -->
-  <div id="head-reg"></div>
-  <div id="name-reg"></div>
-  <table border="1" padding="0"><tr>
-      <td>
-        <div id="charsheet-reg"></div>
-      </td>
-      <td>
-        <div id="chat-reg"></div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-	<div id="new-stat"></div>
-      </td>
-    </tr>
-  </table>
+<div id="charsheet-reg"></div>
+<div id="new-stat"></div>
 
-  <!-- script templates -->
-  <script type="text/template" id="chat-template">
-    <div id="chatcontainer">
-      <div id="chatmain">
-      </div>
-      <div id="chatinput">
-        <button id="chatsendbutton">Send</button>
-        <span id="chatinputspan">
-          <input id="chattext" type="text"></input>
-        </span>
-      </div>
-    </div>
-  </script>
 
-  <script type="text/template" id="name-template">
-    <div id="namedisplay">
-      &gt;&gt; Speaking as <%= name %>
-    </div>
-    <div id="nameinput">
-      <span id="nameinputspan">
-        <input id="nametext" type="text"></input>
-      </span>
-      <button id="namesetbutton">Set</button>
-    </div>
-  </script>
+<!-- script templates -->
+<script type="text/template" id="charsheet-template">
+  <div id="statdisplay">
+    <!--%= showStats() %-->
+  </div>
+</script>
 
-  <script type="text/template" id="head-template">
-    test channel
-  </script>
+<script type="text/template" id="stat-template">
+  <%= name %>: <span class="statspan" id="<%= name %>" title=""> <%= finalval %></span>
+</script>
 
-  <script type="text/template" id="charsheet-template">
-    <div id="statdisplay">
-      <!--%= showStats() %-->
-    </div>
-  </script>
-  
-  <script type="text/template" id="stat-template">
-    <%= name %>: <span class="statspan" id="<%= name %>" title=""> <%= finalval %></span>
-  </script>
-  
-  <script type="text/template" id="new-stat-template">
-    <div id="newstat">
-      <input type="text" id="name"></input>
-      <input type="text" id="formula"></input>
-      <input type="button" id="submit"></input>
-    </div>
-  </script>
-  
-  <!-- page scripts -->
-  <script src="/static/evaluator.js"></script>
-  <script src="/static/strformat.js"></script>
-  <script src="/static/chat.js"></script>
-  <script src="/static/charsheet.js"></script>
-  <!--
-  -->
+<script type="text/template" id="new-stat-template">
+  <div id="newstat">
+    <input type="text" id="name"></input>
+    <input type="text" id="formula"></input>
+    <input type="button" id="submit"></input>
+  </div>
+</script>
+
+<!-- page scripts -->
+<script src="/static/evaluator.js"></script>
+<script src="/static/strformat.js"></script>
+<script src="/static/charsheet.js"></script>
+<!---->
 {% endblock %}

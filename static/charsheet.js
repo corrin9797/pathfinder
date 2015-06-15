@@ -29,7 +29,6 @@ var App = new Marionette.Application();
 App.addRegions({
     headReg: "#head-reg",
     nameReg: "#name-reg",
-    chatReg: "#chat-reg",
     charsheetReg: "#charsheet-reg",
     //#############
     newStatReg: "#new-stat"
@@ -37,15 +36,6 @@ App.addRegions({
 });
 
 App.on("start",function(){
-    var headView = new App.HeadView();
-    App.headReg.show(headView);
-    
-    var nameView = new App.NameView({model:user});
-    App.nameReg.show(nameView);
-    
-    var chatView = new App.ChatView({collection:chats});
-    App.chatReg.show(chatView);
-    
     var charsheetView = new App.CharsheetView({model:charsheet, 
                                                collection:stats});
     App.charsheetReg.show(charsheetView);
@@ -55,11 +45,6 @@ App.on("start",function(){
     //#############
 
     Backbone.history.start();
-    ajaxupdatechat();
-});
-
-App.HeadView = Marionette.ItemView.extend({
-    template: "#head-template"
 });
 
 App.NewStatView = Marionette.ItemView.extend({
@@ -90,67 +75,6 @@ App.NewStatView = Marionette.ItemView.extend({
         }
     }
 })	
-
-
-App.NameView = Marionette.ItemView.extend({
-    template: "#name-template",
-    tagName: "div",
-    events: {
-	    "click #namesetbutton": function(){
-            var newname = $("#nametext").val();
-            if (newname != "") {
-                this.model.set({name:newname});
-            }
-        },
-	    "keydown #nametext": function(e){
-            if (e.keyCode==13) {
-                var newname = $("#nametext").val();
-                if (newname != "") {
-                    this.model.set({name:newname});
-                    this.$("#nametext").focus();
-                }
-            }
-        }
-    },
-    modelEvents: {
-	"change":function(){
-	    this.render();
-	}
-    }
-});
-
-App.ChatView = Marionette.CompositeView.extend({
-    template: "#chat-template",
-    childView: App.MessageView,
-    childViewContainer: "span",
-    events: {
-        "click #chatsendbutton": function() {
-            var newchat = $("#chattext").val();
-            if (newchat != "") {
-                ajaxsendchat(newchat);
-                ajaxupdatechat();
-                this.$("#chattext").focus();
-            }
-            $("#chattext").val("");
-        },
-	    "keydown #chattext": function(e){
-            if (e.keyCode==13) {
-                var newchat = $("#chattext").val();
-                if (newchat != "") {
-                    ajaxsendchat(newchat);
-                    ajaxupdatechat();
-                    this.$("#chattext").focus();
-                }
-                $("#chattext").val("");
-            }
-        }
-    },
-    modelEvents: {
-        "change": function() {
-            this.render();
-        }
-    }
-});
 
 App.StatView = Marionette.ItemView.extend({
     template: "#stat-template",
@@ -448,10 +372,6 @@ App.CharsheetView = Marionette.CompositeView.extend({
 });
 
 var User = Backbone.Model.extend();
-var Message = Backbone.Model.extend();
-var Chats = Backbone.Collection.extend({
-    model:Message
-});
 
 var Stat = Backbone.Model.extend();
 var Stats = Backbone.Collection.extend({
@@ -461,11 +381,10 @@ var Stats = Backbone.Collection.extend({
 var Charsheet = Backbone.Model.extend({});
 
 var user = new User({name:"Anonymous"});
-var chats = new Chats();
 
 var stats = new Stats();
 var charsheet = new Charsheet({
-    module:{layout:""}, 
+    module:{layout:[]}, 
     sheet:{},
     basestat:{},
     modstat:{},

@@ -155,23 +155,6 @@ def charsheet_html(sheetid):
     return render_template("charsheet.html",
                            sheetid=sheetid)
 
-@app.route("/ajax/chat/<channel>",methods=['GET','POST'])
-def ajax_chat(channel):
-    curChan = chatdb.find_one({"title":channel.replace("%20"," ")})
-    if request.method == "POST":
-        pdat = json.loads(request.data)
-        newChat = {"author":pdat["author"],
-                   "content":pdat["content"]}
-        curChan["chat"].append(newChat)
-        if len(curChan["chat"]) > 200:
-            curChan["chat"] = curChan["chat"][len(curChan["chat"])-200:]
-        chatdb.save(curChan)
-    r = ""
-    for msg in curChan["chat"]:
-
-        r+="&lt;%s&gt; %s<br>\n" % (msg["author"],msg["content"])
-    return jsonify(content=r)
-
 @app.route("/ajax/module/<name>",methods=['GET','POST'])
 def ajax_module(name):
     mod = moddb.find_one({"title":name.replace("%20"," ")})
@@ -179,7 +162,6 @@ def ajax_module(name):
         pass #uh
     return bson.json_util.dumps(mod)
 
-#@app.route("/ajax/charsheet/<id>",
 @app.route("/ajax/charsheet/<sheetid>",
            methods=['GET','POST'])
 def ajax_charsheet(sheetid):
@@ -193,13 +175,6 @@ def ajax_charsheet(sheetid):
 
 ####################
 #JESUS
-def initchatdb():
-    testChan = chatdb.find_one({"title":"test"})
-    if not testChan:
-        testChan = {"title":"test",
-                    "chat":[]}
-        chatdb.insert(testChan)
-
 #DEFINITELY NOT PRODUCTION CODE :^(
 def initmoddb():
     pmod = moddb.find_one({"title":"Pathfinder"})
@@ -249,7 +224,6 @@ def getName(ID):
 ##########
 
 def initeverything():
-    initchatdb()
     initmoddb()
     initsheetdb()
 
