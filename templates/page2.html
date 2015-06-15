@@ -2,9 +2,13 @@
 {% block head %}{% endblock %}
 
 {% block body %}
-{{ IDS | safe }}
+<h1>My Sheets</h1>
+<ul>
+  {{ IDS | safe }}
+</ul>
 <br>
-<a href = "/create/yoloRPG" >create a new yoloRPG sheet</a>
+<a href="/create/yoloRPG" ><button type="button" class="btn btn-primary btn-lg">create a new <b>yoloRPG</b> sheet</button></a>
 <br>
-<a href = "/create/Something to Do with Turtles" >create a new Something to Do With Turtles sheet</a>
+<br>
+<a href = "/create/Something to Do with Turtles" ><button type="button" class="btn btn-primary btn-lg">create a new <b>Something to Do With Turtles</b> sheet</button></a>
 {% endblock %}

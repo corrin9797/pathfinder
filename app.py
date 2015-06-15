@@ -111,7 +111,7 @@ def my_sheets():
         print ids
         if (ids != [""]):
             for n in ids:
-                l += "<a href = \"/charsheet/" + str (n) + "\" >" + getName(n) + "</a><br>"
+                l += "<li><a href = \"/charsheet/" + str (n) + "\" >" + getName(n) + "</a></li>"
                 print n
         return render_template  ("page2.html",
                                  corner = escape(session['username']), 
